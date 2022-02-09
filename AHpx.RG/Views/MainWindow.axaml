@@ -3,15 +3,63 @@
         xmlns:vm="using:AHpx.RG.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="1000"
+        xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
         x:Class="AHpx.RG.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AHpx.RG">
+        Title="AHpx.ReadmeGenerator">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	<ScrollViewer>
+		<StackPanel Margin="10">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="AHpx." FontSize="32"/>
+                <TextBlock Text="RG" FontSize="32" Foreground="Crimson"/>
+            </StackPanel>
 
+            <Rectangle Height="1" Fill="Gray" />
+
+            <!-- load dll -->
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="Compiled dll path"/>
+				<TextBox Margin="0,10,0,0" 
+                         Watermark="/bin/Debug/net6.0/xxx.dll" 
+                         ToolTip.Tip="Drag file into or browser manually"
+                         Text="{Binding CompiledDllPath}"/>
+
+                <Button Content="Browse" Command="{Binding BrowseDllCommand}" Margin="0,10,0,0" HorizontalAlignment="Right"/>
+            </StackPanel>
+
+            <!-- load xml documentation -->
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="Xml documentation path"/>
+                <TextBox Margin="0,10,0,0"
+                         Watermark="/bin/Debug/xxx.xml"
+                         ToolTip.Tip="Drag file into or browser manually"
+                         Text="{Binding XmlDocumentationPath}"/>
+
+                <Button Content="Browse" Command="{Binding BrowseXmlCommand}" Margin="0,10,0,0" HorizontalAlignment="Right"/>
+            </StackPanel>
+
+            <!-- types in loaded dll -->
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="Types"/>
+                <ItemsControl Margin="0,10,0,0" Items="{Binding LoadedTypes}" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+							<styles:Card Height="50">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding LoadedTypeSelected}"/>
+                                    <TextBlock Text="{Binding LoadedTypeName}" VerticalAlignment="Center"/>
+                                </StackPanel>
+							</styles:Card>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+	</ScrollViewer>
 </Window>
