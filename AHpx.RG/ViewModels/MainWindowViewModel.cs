@@ -105,7 +105,7 @@ namespace AHpx.RG.ViewModels
 
         public ReactiveCommand<string, Unit>? RefreshLoadedTypesCommand { get; set; }
 
-        private Unit RefreshLoadedTypes(string path)
+        private Unit RefreshLoadedTypes(string? path)
         {
             var types = AssemblyUtils.GetTypes(path);
 
