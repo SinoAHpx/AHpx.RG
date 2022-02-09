@@ -59,7 +59,7 @@
                             <styles:Card Height="50">
                                 <StackPanel Orientation="Horizontal">
                                     <CheckBox IsChecked="{Binding LoadedTypeSelected}" />
-                                    <TextBlock Text="{Binding LoadedTypeName}" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding LoadedType.FullName}" VerticalAlignment="Center" />
                                 </StackPanel>
                             </styles:Card>
                         </DataTemplate>

@@ -8,10 +8,14 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AHpx.RG.Core.Core;
 using AHpx.RG.Core.Utils;
 using AHpx.RG.Services;
+using Avalonia;
 using Avalonia.Controls;
 using Manganese.Text;
+using Material.Styles.Themes;
+using Material.Styles.Themes.Base;
 
 namespace AHpx.RG.ViewModels
 {
@@ -111,7 +115,7 @@ namespace AHpx.RG.ViewModels
 
             LoadedTypes.Clear();
 
-            types.ForEach(x => LoadedTypes.Add(new LoadedTypeViewModel(x.FullName!)));
+            types.ForEach(x => LoadedTypes.Add(new LoadedTypeViewModel(x!)));
 
             return Unit.Default;
         }
@@ -154,7 +158,18 @@ namespace AHpx.RG.ViewModels
         {
             if (CompiledDllPath?.EndsWith(".dll") is true && XmlDocumentationPath?.EndsWith(".xml") is true)
             {
-                //generate markdown
+                var core = new ReadmeGeneratorCore
+                {
+                    XmlDocumentationPath = XmlDocumentationPath,
+                    CompiledDllPath = CompiledDllPath
+                };
+
+                var markdown = LoadedTypes.Where(s => s.LoadedTypeSelected)
+                    .Select(x => x.LoadedType)
+                    .Select(core.GetContent)
+                    .JoinToString(Environment.NewLine);
+
+                PreviewerMarkdown = markdown;
             }
 
             return Unit.Default;
@@ -176,8 +191,10 @@ namespace AHpx.RG.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .DistinctUntilChanged()
                 // .Where(x => x.Item1?.EndsWith(".dll") is true && x.Item2?.EndsWith(".xml") is true)
-                .InvokeCommand(RefreshPreviewerCommand!);
+                .Subscribe(_ => RefreshPreviewer());
 
+            //todo: add link text box
+            //todo: add dark mode compatibility
         }
 
         private void InitializeCommands()

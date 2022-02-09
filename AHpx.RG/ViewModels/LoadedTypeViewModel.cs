@@ -1,13 +1,15 @@
-﻿namespace AHpx.RG.ViewModels;
+﻿using System;
+
+namespace AHpx.RG.ViewModels;
 
 public class LoadedTypeViewModel : ViewModelBase
 {
-    private string _loadedTypeName;
+    private Type _loadedType;
 
-    public string LoadedTypeName
+    public Type LoadedType
     {
-        get => _loadedTypeName;
-        set => this.RaiseAndSetIfChanged(ref _loadedTypeName, value);
+        get => _loadedType;
+        set => this.RaiseAndSetIfChanged(ref _loadedType, value);
     }
 
     private bool _loadedTypeSelected;
@@ -18,9 +20,9 @@ public class LoadedTypeViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _loadedTypeSelected, value);
     }
 
-    public LoadedTypeViewModel(string loadedTypeName = null, bool loadedTypeSelected = default)
+    public LoadedTypeViewModel(Type loadedType = null, bool loadedTypeSelected = default)
     {
-        _loadedTypeName = loadedTypeName;
+        _loadedType = loadedType;
         _loadedTypeSelected = loadedTypeSelected;
     }
 }
