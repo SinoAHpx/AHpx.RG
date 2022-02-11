@@ -49,6 +49,14 @@
                         HorizontalAlignment="Right" />
             </StackPanel>
 
+            <!-- repo link -->
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="Repository link"/>
+                <TextBox Margin="0,10,0,0"
+                         Watermark="A repository link is optional, and if will be used as the header of each type in markdown"
+                         ToolTip.Tip="Don't care about /"
+                         Text="{Binding RepositoryLink}" />
+            </StackPanel>
             <!-- types in loaded dll -->
             <StackPanel Margin="0,10,0,0" IsVisible="{Binding LoadedTypes.Count}">
                 <TextBlock Text="Types" />

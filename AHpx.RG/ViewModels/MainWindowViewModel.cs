@@ -163,16 +163,35 @@ namespace AHpx.RG.ViewModels
                     XmlDocumentationPath = XmlDocumentationPath,
                     CompiledDllPath = CompiledDllPath
                 };
+                
+                var raw = LoadedTypes.Where(s => s.LoadedTypeSelected)
+                    .Select(x => x.LoadedType);
 
-                var markdown = LoadedTypes.Where(s => s.LoadedTypeSelected)
-                    .Select(x => x.LoadedType)
-                    .Select(core.GetContent)
-                    .JoinToString(Environment.NewLine);
+                string markdown;
+
+                if (RepositoryLink.IsNullOrEmpty())
+                    markdown = raw.Select(core.GetContent)
+                        .JoinToString(Environment.NewLine);
+                else
+                    markdown = raw.Select(x => core.GetContent(x, new Uri(RepositoryLink)))
+                        .JoinToString(Environment.NewLine);
 
                 PreviewerMarkdown = markdown;
             }
 
             return Unit.Default;
+        }
+
+        #endregion
+
+        #region Repository link
+
+        private string _repositoryLink;
+
+        public string RepositoryLink
+        {
+            get => _repositoryLink;
+            set => this.RaiseAndSetIfChanged(ref _repositoryLink, value);
         }
 
         #endregion
@@ -187,14 +206,12 @@ namespace AHpx.RG.ViewModels
                 .Where(x => x?.EndsWith(".dll") is true)
                 .InvokeCommand(RefreshLoadedTypesCommand!);
 
-            this.WhenAnyValue(x => x.CompiledDllPath, z => z.XmlDocumentationPath)
+            this.WhenAnyValue(x => x.CompiledDllPath,
+                    z => z.XmlDocumentationPath,
+                    y => y.RepositoryLink)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .DistinctUntilChanged()
-                // .Where(x => x.Item1?.EndsWith(".dll") is true && x.Item2?.EndsWith(".xml") is true)
                 .Subscribe(_ => RefreshPreviewer());
-
-            //todo: add link text box
-            //todo: add dark mode compatibility
         }
 
         private void InitializeCommands()

@@ -12,19 +12,21 @@ namespace AHpx.RG.Core
     {
         public static void Main()
         {
-            var core = new ReadmeGeneratorCore
-            {
-                CompiledDllPath = @"E:\CSharp\Manganese\Manganese\bin\Debug\net6.0\Manganese.dll",
-                XmlDocumentationPath = @"E:\CSharp\Manganese\Manganese\bin\Debug\Manganese.xml"
-            };
+            // var core = new ReadmeGeneratorCore
+            // {
+            //     CompiledDllPath = @"E:\CSharp\Manganese\Manganese\bin\Debug\net6.0\Manganese.dll",
+            //     XmlDocumentationPath = @"E:\CSharp\Manganese\Manganese\bin\Debug\Manganese.xml"
+            // };
+            //
+            // var list = new List<string>();
+            // foreach (var type in core.Types.Output())
+            // {
+            //     list.Add(core.GetContent(type, new Uri("https://github.com/SinoAHpx/Manganese/tree/master/")));
+            // }
+            //
+            // File.WriteAllLines(@"C:\Users\ahpx\Desktop\test11.md", list);
 
-            var list = new List<string>();
-            foreach (var type in core.Types.Output())
-            {
-                list.Add(core.GetContent(type, new Uri("https://github.com/SinoAHpx/Manganese/tree/master/")));
-            }
-
-            File.WriteAllLines(@"C:\Users\ahpx\Desktop\test11.md", list);
+            DateTime.Now.Hour.CW();
         }
 
         public static object CW(this object o)
