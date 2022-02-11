@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using AHpx.RG.Core.Utils;
@@ -112,7 +113,7 @@ public class ReadmeGeneratorCore
         if (!link.EndsWith("/"))
             link += "/";
 
-        return GetContent(type, $"[{type.Name}({link}{type.Namespace?.Split(".").JoinToString("/")}/{type.Name}.cs)]");
+        return GetContent(type, $"[{type.Name}]({link}{type.Namespace?.Split(".").JoinToString("/")}/{type.Name}.cs)");
     }
 
     public string GetContent(MethodInfo methodInfo, Type type)
