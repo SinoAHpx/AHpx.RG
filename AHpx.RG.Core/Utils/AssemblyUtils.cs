@@ -10,7 +10,15 @@ public static class AssemblyUtils
         {
             var assembly = Assembly.LoadFile(dllPath);
 
-            return assembly.GetTypes().Where(x => x.IsPublic).ToList();
+            try
+            {
+                return assembly.GetTypes().Where(x => x.IsPublic).ToList();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.Where(x => x != null).Where(x => x.IsPublic).ToList()!;
+            }
+            ;
         }
 
         return null;

@@ -27,13 +27,20 @@ public class ReadmeGeneratorCore
 
     private XElement? Map(Type type)
     {
-        var re = MemberElements
-            .Where(e => e?.Attribute("name")!.Value.StartsWith("T") is true)
-            .First(e => e?
-                .Attribute("name")!.Value.SubstringAfter(":")
-                .Split(".").Last() == type.Name);
+        try
+        {
+            var re = MemberElements
+                .Where(e => e?.Attribute("name")!.Value.StartsWith("T") is true)
+                .First(e => e?
+                    .Attribute("name")!.Value.SubstringAfter(":")
+                    .Split(".").Last() == type.Name);
 
-        return re;
+            return re;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private XElement? Map(MethodInfo method)
