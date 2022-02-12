@@ -15,4 +15,8 @@
       <DocumentationFile>bin\Release\AHpx.RG.TestLib.xml</DocumentationFile>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="bin\Debug" />
+    </ItemGroup>
+
 </Project>

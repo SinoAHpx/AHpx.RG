@@ -1,0 +1,334 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AHpx.RG.TestLib</name>
+    </assembly>
+    <members>
+        <member name="T:AHpx.RG.TestLib.TestLib1">
+            <summary>
+            This is test1, basic
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test1(System.String)">
+            <summary>
+            This is a test method 1
+            </summary>
+            <param name="p1">this is a test parameter 1</param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test2(System.Int32)">
+            <summary>
+            This is a test method 2
+            </summary>
+            <param name="p1">This is a test p1</param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test3(System.Object)">
+            <summary>
+            This is a test method 3
+            </summary>
+            <param name="p1">this is test p3</param>
+            <returns>this is a return value test 3</returns>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib2">
+            <summary>
+            This is test2, generic tests
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test1``1">
+            <summary>
+            This is generic test1
+            </summary>
+            <typeparam name="T">this is type argument 1</typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test2``2">
+            <summary>
+            This is generic method 2
+            </summary>
+            <typeparam name="T1">this is type argument 1</typeparam>
+            <typeparam name="T2">this is type argument 2</typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test3``1(``0)">
+            <summary>
+            This is generic method 3
+            </summary>
+            <param name="p1">this is param1</param>
+            <typeparam name="T">this is type arg 1</typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test4``2(``0,``1)">
+            <summary>
+            this is generic method 4
+            </summary>
+            <param name="p1">p1</param>
+            <param name="p2"></param>
+            <typeparam name="T1">g a 1</typeparam>
+            <typeparam name="T2">g a 2</typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test5``1(``0)">
+            <summary>
+            this is generic method 5
+            </summary>
+            <param name="p1">g p 1</param>
+            <typeparam name="T">g a 1</typeparam>
+            <returns>this is return value</returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test6``2(``0)">
+            <summary>
+            this is generic method 6
+            </summary>
+            <param name="t1"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test7``4(``0,``1,``2,``3)">
+            <summary>
+            this is multiple type arguments method 7
+            </summary>
+            <param name="p1">p1</param>
+            <param name="p2"></param>
+            <param name="p3">p3</param>
+            <param name="p4"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3">t3</typeparam>
+            <typeparam name="T4"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test8``4(``0,``1,``2,``3)">
+            <summary>
+            This is multiple type arguments method 8
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <param name="p4"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+            <typeparam name="T4"></typeparam>
+            <returns>this is a complicated return value</returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test9``4(``3,``2,``1,``0)">
+            <summary>
+            This is multiple type arguments method 8
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <param name="p4"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+            <typeparam name="T4"></typeparam>
+            <returns>this is a complicated return value</returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test2(System.String)">
+            <summary>
+            test method 2, incomplete summary
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test3(System.String,System.String)">
+            <summary>
+            test3, dedicated ignore parameter summary
+            </summary>
+            <param name="p1">p1</param>
+            <returns></returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test4">
+            <summary>
+            test4, ignore return summary
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test5``1">
+            <summary>
+            test5, ignore type arg summary
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test6``2">
+            <summary>
+            test6, missing type arg summary
+            </summary>
+            <typeparam name="T1"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test7``2">
+            <summary>
+            test7, no type arg summary
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test8``4">
+            <summary>
+            test8, missing multiple type args
+            </summary>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T4"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test9``2(``0,``1)">
+            <summary>
+            test9, missing type arg summary and corresponding param summary
+            </summary>
+            <param name="p2"></param>
+            <typeparam name="T2"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test10``4(``3,``2)">
+            <summary>
+            test10, missing used type args
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib3.Test11``4(``3,``2)">
+            <summary>
+            test11, missing unused type args
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <typeparam name="T3"></typeparam>
+            <typeparam name="T4"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib4`1">
+            <summary>
+            this is test lib4
+            </summary>
+            <typeparam name="T">this is class-level type arg</typeparam>
+        </member>
+        <member name="P:AHpx.RG.TestLib.TestLib4`1.Test1">
+            <summary>
+            This is generic prop 1
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test3">
+            <summary>
+            This is test method 3, return generic type
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test4(`0)">
+            <summary>
+            test4, a method with generic parameter 
+            </summary>
+            <param name="p1"></param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test5``1(`0,``0)">
+            <summary>
+            test5, method with method-level generic arg as parameter 2
+            </summary>
+            <param name="p1"></param>
+            <param name="p2">this is p2</param>
+            <typeparam name="T1">this is a method-level generic param</typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test6``3(``2,``1,``0,`0)">
+            <summary>
+            test6, method with multiple type args
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <param name="p4"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test7``3(``2,``1,``0,`0)">
+            <summary>
+            test7, method with multiple type args, no summary
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test8``3(``2,``1,``0,`0)">
+            <summary>
+            test8, method with multiple type args, missing summary
+            </summary>
+            <param name="p1"></param>
+            <param name="p4"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T3"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib5`3">
+            <summary>
+            testlib 5, multiple class-level type args
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib5`3.Test2(`2,`1,`2)">
+            <summary>
+            test method3, all generic param are from class
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib5`3.Test3``1(`2,`1,``0)">
+            <summary>
+            
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib6`1">
+            <summary>
+            this is testlib6, interface inheritance test
+            </summary>
+            <typeparam name="TTT"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib6`1.Test1">
+            <summary>
+            class level test1
+            </summary>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException">this is an exception summary</exception>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib6`1.Test2``1(System.String,``0)">
+            <summary>
+            
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <typeparam name="T2"></typeparam>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib6`1.Test3``2(``1,System.String,``0)">
+            <summary>
+            
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestInterface6`1">
+            <summary>
+            this is a summary for interface
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestInterface6`1.Test1">
+            <summary>
+            this is interface test1
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestInterface6`1.Test2``1(`0,``0)">
+            <summary>
+            this is interface test2
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <typeparam name="T2"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestInterface6`1.Test3``2(``1,`0,``0)">
+            <summary>
+            this is interface test3
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+        </member>
+    </members>
+</doc>
