@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,8 @@
 
   <ItemGroup>
     <PackageReference Include="Manganese" Version="1.2.0" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="6.0.2-mauipre.1.22054.8" />
   </ItemGroup>
 
 </Project>

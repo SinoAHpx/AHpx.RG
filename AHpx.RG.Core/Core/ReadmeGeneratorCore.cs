@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Xml.Linq;
 using AHpx.RG.Core.Utils;
@@ -20,6 +21,59 @@ public class ReadmeGeneratorCore
     public XDocument XDocument => XDocument.Parse(File.ReadAllText(XmlDocumentationPath!));
 
     private IEnumerable<XElement?> MemberElements => XDocument.Descendants("member");
+
+    #endregion
+
+    #region Checker
+
+    public bool HasSummary(Type type) =>
+        MemberElements
+            .Where(x => x!.Attribute("name")!.Value.StartsWith("T:"))
+            .Any(x => x!.Attribute("name")!.Value
+                .SubstringAfter("T:").Split(".")
+                .Last() == type.Name);
+
+    public bool HasSummary(MethodInfo methodInfo)
+    {
+        var parameterTypes = methodInfo
+            .GetParameters()
+            .Select(x => x.ParameterType.FullName)
+            .ToList();
+
+        var signaure = $"{methodInfo.DeclaringType?.FullName}.{methodInfo?.Name}({parameterTypes.JoinToString(",")})";
+
+        
+        var candidates = MemberElements
+            .Where(x => x!.Attribute("name")!.Value.StartsWith("M:"))
+            .Where(x => x!.Attribute("name")!.Value.Contains(methodInfo.Name))
+            .ToList();
+
+        if(!candidates.Any())
+            return false;
+
+        if (candidates.Count == 1)
+            return true;
+
+        foreach (var candidate in candidates)
+        {
+            // var candidateName = candidate!.Attribute("name")!.Value;
+            // Console.WriteLine($"Signature: {signaure}");
+            // Console.WriteLine($"Candidate: {candidateName}");
+        }
+
+        return false;
+    }
+
+    private string GetMethodSignature(MethodInfo methodInfo)
+    {
+        var signature = $"{methodInfo.DeclaringType?.FullName}.{methodInfo.Name}";
+        if (methodInfo.IsGenericMethod)
+            signature += $"``{methodInfo.GetGenericArguments().Length}";
+
+        // methodInfo.GetParameters().Where(x => )
+        // methodInfo.GetParameters()
+        return null;
+    }
 
     #endregion
 
@@ -63,7 +117,8 @@ public class ReadmeGeneratorCore
             }
         }
 
-        throw new ArgumentException($"Method {method.Name} has no summary in {method.GetParameters().JoinToString(",")}");
+        throw new ArgumentException(
+            $"Method {method.Name} has no summary in {method.GetParameters().JoinToString(",")}");
 
         // return null;
     }
@@ -84,11 +139,14 @@ public class ReadmeGeneratorCore
     private string GetContent(Type type, string header)
     {
         var typeElement = Map(type);
+        if (typeElement == null)
+            return string.Empty;
+
         var typeContent = new StringBuilder($"### {header}{Environment.NewLine}");
 
         var typeSummaryElement = typeElement?.Element("summary");
         var typeSummary = typeSummaryElement!.Value.Trim()
-            .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+            .Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None)
             .Where(x => !x.IsNullOrEmpty())
             .Select(x => x.Trim())
             .JoinToString(Environment.NewLine);
@@ -146,7 +204,6 @@ public class ReadmeGeneratorCore
             Console.WriteLine(e.Message);
             return string.Empty;
         }
-        
     }
 
     public string GetContent(ParameterInfo parameterInfo, MethodInfo methodInfo)
