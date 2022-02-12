@@ -16,7 +16,7 @@ public class ReadmeGeneratorCore
 
     public string? XmlDocumentationPath { get; set; }
 
-    public List<Type>? Types => AssemblyUtils.GetTypes(CompiledDllPath);
+    public List<Type>? Types => ReflectionUtils.GetTypes();
 
     public XDocument XDocument => XDocument.Parse(File.ReadAllText(XmlDocumentationPath!));
 

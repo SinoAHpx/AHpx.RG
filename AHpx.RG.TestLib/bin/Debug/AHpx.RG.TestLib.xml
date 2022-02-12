@@ -28,6 +28,33 @@
             <param name="p1">this is test p3</param>
             <returns>this is a return value test 3</returns>
         </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test4(System.String,System.String,System.String,System.Int32,System.Int32[],System.String[])">
+            <summary>
+            test4, multiple parameters
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <param name="p3"></param>
+            <param name="p4"></param>
+            <param name="p5"></param>
+            <param name="p6"></param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test5(AHpx.RG.TestLib.TestLib3,System.Func{System.String},System.Func{System.String,System.String},System.Action{System.Int32},System.Collections.Generic.IEnumerable{System.Int32})">
+            <summary>
+            test 5
+            </summary>
+            <param name="p8"></param>
+            <param name="p9"></param>
+            <param name="p10"></param>
+            <param name="p11"></param>
+            <param name="p12"></param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test6(System.Collections.Generic.Dictionary{System.Int32,System.Collections.Generic.Dictionary{System.Int32,System.String}})">
+            <summary>
+            test6
+            </summary>
+            <param name="p1"></param>
+        </member>
         <member name="T:AHpx.RG.TestLib.TestLib2">
             <summary>
             This is test2, generic tests
@@ -79,7 +106,7 @@
             <typeparam name="T2"></typeparam>
             <returns></returns>
         </member>
-        <member name="M:AHpx.RG.TestLib.TestLib2.Test7``4(``0,``1,``2,``3)">
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test7``4(``0,``2,``1,``3)">
             <summary>
             this is multiple type arguments method 7
             </summary>
@@ -119,6 +146,14 @@
             <typeparam name="T3"></typeparam>
             <typeparam name="T4"></typeparam>
             <returns>this is a complicated return value</returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib2.Test10``2(System.Collections.Generic.Dictionary{``0,``1})">
+            <summary>
+            
+            </summary>
+            <param name="p1"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
         </member>
         <member name="M:AHpx.RG.TestLib.TestLib3.Test2(System.String)">
             <summary>
@@ -329,6 +364,54 @@
             <param name="p3"></param>
             <typeparam name="T1"></typeparam>
             <typeparam name="T2"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib7">
+            <summary>
+            Testlib7, overloads tests
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test1">
+            <summary>
+            t1
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test1(System.String)">
+            <summary>
+            t1. overloaded
+            </summary>
+            <param name="p1"></param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test1(System.Int32)">
+            <summary>
+            t1, overloaded
+            </summary>
+            <param name="p1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test2``1">
+            <summary>
+            t2, generic
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test2">
+            <summary>
+            t1, without generic
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test2``2">
+            <summary>
+            T2, multiple generic args
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="T1"></typeparam>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib7.Test2``1(``0)">
+            <summary>
+            t2, generic method with generic parameter
+            </summary>
+            <param name="p1"></param>
+            <typeparam name="T"></typeparam>
         </member>
     </members>
 </doc>

@@ -80,7 +80,7 @@ public class TestLib2
     /// <typeparam name="T2"></typeparam>
     /// <typeparam name="T3">t3</typeparam>
     /// <typeparam name="T4"></typeparam>
-    public void Test7<T1, T2, T3, T4>(T1 p1, T2 p2, T3 p3, T4 p4)
+    public void Test7<T1, T3, T2, T4>(T1 p1, T2 p2, T3 p3, T4 p4)
     {
         
     }
@@ -117,5 +117,16 @@ public class TestLib2
     public Dictionary<T1, Dictionary<T2, Dictionary<T3, T4>>> Test9<T1, T2, T3, T4>(T4 p1, T3 p2, T2 p3, T1 p4)
     {
         return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    public void Test10<T1, T2>(Dictionary<T1, T2> p1)
+    {
+        //todo: dynamic generic typed dictionary issue
     }
 }

@@ -32,4 +32,40 @@ public class TestLib1
     {
         return "";
     }
+
+    /// <summary>
+    /// test4, multiple parameters
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    /// <param name="p3"></param>
+    /// <param name="p4"></param>
+    /// <param name="p5"></param>
+    /// <param name="p6"></param>
+    public void Test4(string p1, string p2, string p3, int p4, int[] p5, params string[] p6)
+    {
+        
+    }
+
+    /// <summary>
+    /// test 5
+    /// </summary>
+    /// <param name="p8"></param>
+    /// <param name="p9"></param>
+    /// <param name="p10"></param>
+    /// <param name="p11"></param>
+    /// <param name="p12"></param>
+    public void Test5(TestLib3 p8, Func<string> p9, Func<string, string> p10, Action<int> p11, IEnumerable<int> p12)
+    {
+        
+    }
+
+    /// <summary>
+    /// test6
+    /// </summary>
+    /// <param name="p1"></param>
+    public void Test6(Dictionary<int, Dictionary<int, string>> p1)
+    {
+        
+    }
 }

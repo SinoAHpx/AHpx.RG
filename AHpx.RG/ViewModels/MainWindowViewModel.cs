@@ -111,7 +111,7 @@ namespace AHpx.RG.ViewModels
 
         private Unit RefreshLoadedTypes(string? path)
         {
-            var types = AssemblyUtils.GetTypes(path);
+            var types = ReflectionUtils.GetTypes();
 
             LoadedTypes.Clear();
 
