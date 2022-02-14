@@ -77,4 +77,15 @@ public class TestLib4<T> where T : new()
     {
         
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="P1"></param>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    public void Test9<T1, T2>(Dictionary<T1, Dictionary<T2, T>> P1)
+    {
+        
+    }
 }

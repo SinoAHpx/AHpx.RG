@@ -68,4 +68,12 @@ public class TestLib1
     {
         
     }
+
+    /// <summary>
+    /// t7, no parameters
+    /// </summary>
+    public void Test7()
+    {
+        
+    }
 }

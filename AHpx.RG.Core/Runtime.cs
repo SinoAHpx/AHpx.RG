@@ -30,13 +30,21 @@ namespace AHpx.RG.Core
                     @"C:\Users\ahpx\source\repos\AHpx.RG\AHpx.RG.TestLib\bin\Debug\AHpx.RG.TestLib.xml"
             };
             
-            var types = typeof(TestLib1).Assembly.GetTypes().Where(x => x.Name.StartsWith("Test"));
+            var types = typeof(TestLib2).Assembly.GetTypes().Where(x => x.Name.StartsWith("Test"));
             
             foreach (var type in types)
             {
                 foreach (var method in type.GetMethods().Where(x => x.IsPublic))
                 {
-                    method.GetSignature().CW();
+                    var signature = method.GetSignature();
+                    var element = Global.XmlMembers
+                        .Select(x => x.Attribute("name")!.Value)
+                        .FirstOrDefault(x => x!.Empty("M:") == signature, null);
+
+                    if (!element!.IsNullOrEmpty())
+                    {
+                        Console.WriteLine(element);
+                    }
                 }
             }
             

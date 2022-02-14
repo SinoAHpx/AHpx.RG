@@ -55,6 +55,11 @@
             </summary>
             <param name="p1"></param>
         </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.Test7">
+            <summary>
+            t7, no parameters
+            </summary>
+        </member>
         <member name="T:AHpx.RG.TestLib.TestLib2">
             <summary>
             This is test2, generic tests
@@ -277,6 +282,14 @@
             <typeparam name="T1"></typeparam>
             <typeparam name="T3"></typeparam>
         </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.Test9``2(System.Collections.Generic.Dictionary{``0,System.Collections.Generic.Dictionary{``1,`0}})">
+            <summary>
+            
+            </summary>
+            <param name="P1"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+        </member>
         <member name="T:AHpx.RG.TestLib.TestLib5`3">
             <summary>
             testlib 5, multiple class-level type args
@@ -412,6 +425,35 @@
             </summary>
             <param name="p1"></param>
             <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib8`1">
+            <summary>
+            type8, nested tests
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib8`1.NestedTestLib8`3">
+            <summary>
+            this is a nested type
+            </summary>
+            <typeparam name="T1"></typeparam>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib8`1.NestedTestLib8`3.NestedNestedTestLib8`2">
+            <summary>
+            this is a nested type in nested type
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib8`1.NestedTestLib8`3.NestedNestedTestLib8`2.Test2(System.Collections.Generic.Dictionary{`5,`0})">
+            <summary>
+            t2
+            </summary>
+            <param name="p1"></param>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib8`1.NestedTestLib8`3.Test1(System.Collections.Generic.Dictionary{`3,`1})">
+            <summary>
+            t1
+            </summary>
+            <param name="p1"></param>
         </member>
     </members>
 </doc>
