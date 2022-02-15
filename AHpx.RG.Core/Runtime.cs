@@ -39,7 +39,7 @@ namespace AHpx.RG.Core
                     var signature = method.GetSignature();
                     var element = Global.XmlMembers
                         .Select(x => x.Attribute("name")!.Value)
-                        .FirstOrDefault(x => x!.Empty("M:") == signature, null);
+                        .FirstOrDefault(x => x == signature, null);
 
                     if (!element!.IsNullOrEmpty())
                     {
@@ -47,27 +47,6 @@ namespace AHpx.RG.Core
                     }
                 }
             }
-            
-            return;
-            
-            var core = new ReadmeGeneratorCore
-            {
-                CompiledDllPath = @"C:\Users\ahpx\source\repos\AHpx.RG\AHpx.RG.TestLib\bin\Debug\netstandard2.0\AHpx.RG.TestLib.dll",
-                XmlDocumentationPath = @"C:\Users\ahpx\source\repos\AHpx.RG\AHpx.RG.TestLib\bin\Debug\AHpx.RG.TestLib.xml"
-            };
-
-            foreach (var type in core.Types)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"{type.FullName}: {core.HasSummary(type)}");
-                
-                // foreach (var method in type.GetMethods())
-                // {
-                //     
-                // }
-                // Console.WriteLine();
-            }
-
         }
 
         public static object CW(this object o)

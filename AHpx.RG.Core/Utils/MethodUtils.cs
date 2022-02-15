@@ -32,8 +32,8 @@ public static class MethodUtils
         var parameters = method.GetParameters();
         if (parameters.Length != 0)
             signature += $"({method.GetParameters().Select(p => p.GetSignature()).JoinToString(",")})";
-        
-        return signature;
+
+        return $"M:{signature}";
     }
 
     private static string GetSignature(this ParameterInfo parameterInfo)
@@ -99,6 +99,14 @@ public static class MethodUtils
 
         return name;
     }
-    
-    
+
+    public static XElement? GetElement(this MethodInfo method)
+    {
+        if (!method.HasElement())
+            return null;
+
+        var candidates = method.GetCandidates();
+
+        return candidates.FirstOrDefault(x => x!.Attribute("name")!.Value == method.GetSignature(), null);
+    }
 }

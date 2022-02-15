@@ -1,4 +1,5 @@
-﻿using Manganese.Text;
+﻿using System.Xml.Linq;
+using Manganese.Text;
 
 namespace AHpx.RG.Core.Utils;
 
@@ -11,24 +12,20 @@ public static class TypeUtils
                 .SubstringAfter("T:").Split(".")
                 .Last() == type.Name);
 
-    public static string GetSignature(this Type type)
+    public static XElement? GetElement(this Type type)
     {
-        if (!type.IsGenericType)
-            return type.GetFullname();
+        if (!type.HasElement())
+            return null;
 
-        return type.GetGenericTypeSignature();
-    }
-
-    private static string GetGenericTypeSignature(this Type type)
-    {
-        var signature = type
-            .GetGenericArguments()
-            .Select(t => t.GetGenericTypeSignature())
-            .JoinToString(",");;
-
-        return $"{type.GetFullname(false)}{{{signature}}}";
+        return Global.XmlMembers
+            .FirstOrDefault(x => x!.Attribute("name")!.Value == type.GetSignature(), null);
     }
     
+    public static string GetSignature(this Type type)
+    {
+        return $"T:{type.GetFullname()}";
+    }
+
     /// <summary>
     /// 
     /// </summary>
