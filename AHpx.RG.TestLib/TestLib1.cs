@@ -5,9 +5,7 @@
 /// </summary>
 public class TestLib1
 {
-    /// <summary>
-    /// This is a test method 1
-    /// </summary>
+    
     /// <param name="p1">this is a test parameter 1</param>
     public void Test1(string p1)
     {
@@ -76,4 +74,48 @@ public class TestLib1
     {
         
     }
+
+    /// <summary>
+    /// tp1
+    /// </summary>
+    public string TestProperty1 { get; set; }
+
+    /// <summary>
+    /// tp2
+    /// </summary>
+    public int TestProperty2 { get; set; }
+
+    /// <summary>
+    /// tp3
+    /// </summary>
+    public Dictionary<int, string> TestProperty3 { get; set; }
+
+    /// <summary>
+    /// tp4
+    /// </summary>
+    public string TestField1;
+
+    /// <summary>
+    /// tp5
+    /// </summary>
+    public Dictionary<int, string> TestField2;
+
+    /// <summary>
+    /// this is a constructor
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    public TestLib1(string p1, Dictionary<int, string> p2)
+    {
+    }
+
+    /// <summary>
+    /// this is test delegate
+    /// </summary>
+    public delegate void TestDelegate1(string p1);
+    
+    /// <summary>
+    /// this is a test event
+    /// </summary>
+    public event EventHandler<string> TestEvent1;
 }

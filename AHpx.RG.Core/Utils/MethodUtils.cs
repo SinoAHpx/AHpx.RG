@@ -31,18 +31,20 @@ public static class MethodUtils
 
         var parameters = method.GetParameters();
         if (parameters.Length != 0)
-            signature += $"({method.GetParameters().Select(p => p.GetSignature()).JoinToString(",")})";
+            signature += $"({method.GetParameters().Select(p => p.GetSignature<MethodInfo>()).JoinToString(",")})";
 
-        return $"M:{signature}";
+        return $"{method.GetSignaturePrefix()}{signature}";
     }
 
-    private static string GetSignature(this ParameterInfo parameterInfo)
+    public static string GetSignature<T>(this ParameterInfo parameterInfo) where T : MethodBase
     {
         var parameterType = parameterInfo.ParameterType;
-        var methodInfo = (parameterInfo.Member as MethodInfo)!;
+        var methodInfo = (parameterInfo.Member as T)!;
         var declaringType = methodInfo.DeclaringType!;
 
-        var methodGenericArgs = methodInfo.GetGenericArguments().ToList();
+        var methodGenericArgs = typeof(T) == typeof(ConstructorInfo)
+            ? new List<Type>()
+            : methodInfo.GetGenericArguments().ToList();
         var typeGenericArgs = declaringType.GetGenericArguments().ToList();
         
         if (!parameterType.IsGenericType)
@@ -50,6 +52,19 @@ public static class MethodUtils
 
         return $"{parameterType.GetFullname(false)}" +
                $"{{{parameterInfo.GetGenericParameterSignature(methodGenericArgs, typeGenericArgs)}}}";
+    }
+    
+    
+    public static string GetSignature(this ConstructorInfo constructorInfo)
+    {
+        var signature = constructorInfo.GetFullname();
+        
+        var parameters = constructorInfo.GetParameters();
+        if (parameters.Length != 0)
+            signature +=
+                $"({constructorInfo.GetParameters().Select(p => p.GetSignature<ConstructorInfo>()).JoinToString(",")})";
+
+        return $"{constructorInfo.GetSignaturePrefix()}{signature}";
     }
     
     private static string GetGenericParameterSignature(this ParameterInfo parameterInfo, List<Type> methodGenericArgs, List<Type> typeGenericArgs)
@@ -99,14 +114,12 @@ public static class MethodUtils
 
         return name;
     }
-
-    public static XElement? GetElement(this MethodInfo method)
+    
+    
+    public static string GetFullname(this ConstructorInfo constructorInfo)
     {
-        if (!method.HasElement())
-            return null;
+        var type = constructorInfo.DeclaringType!;
 
-        var candidates = method.GetCandidates();
-
-        return candidates.FirstOrDefault(x => x!.Attribute("name")!.Value == method.GetSignature(), null);
+        return $"{type.GetFullname()}.{constructorInfo.Name.Replace(".", "#")}";
     }
 }

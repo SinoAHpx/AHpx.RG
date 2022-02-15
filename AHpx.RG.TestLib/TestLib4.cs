@@ -88,4 +88,12 @@ public class TestLib4<T> where T : new()
     {
         
     }
+
+    /// <summary>
+    /// this is constructor of testlib 4
+    /// </summary>
+    /// <param name="p1"></param>
+    public TestLib4(T p1)
+    {
+    }
 }

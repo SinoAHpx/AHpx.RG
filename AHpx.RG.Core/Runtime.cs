@@ -15,13 +15,16 @@ namespace AHpx.RG.Core
 {
     public static class Runtime
     {
-        public static void test1(string[] test1)
-        {
-            
-        }
-        
         public static void Main()
         {
+
+            foreach (var memberInfo in typeof(TestLib1).GetMembers())
+            {
+                memberInfo.GetMemberSignature().CW();
+            }
+
+            return;
+            
             Global.Config = new GlobalConfig
             {
                 CompiledLibraryPath =
@@ -49,7 +52,7 @@ namespace AHpx.RG.Core
             }
         }
 
-        public static object CW(this object o)
+        public static T CW<T>(this T o)
         {
             Console.WriteLine(o);
 

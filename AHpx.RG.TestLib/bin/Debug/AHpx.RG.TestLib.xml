@@ -10,9 +10,6 @@
             </summary>
         </member>
         <member name="M:AHpx.RG.TestLib.TestLib1.Test1(System.String)">
-            <summary>
-            This is a test method 1
-            </summary>
             <param name="p1">this is a test parameter 1</param>
         </member>
         <member name="M:AHpx.RG.TestLib.TestLib1.Test2(System.Int32)">
@@ -58,6 +55,48 @@
         <member name="M:AHpx.RG.TestLib.TestLib1.Test7">
             <summary>
             t7, no parameters
+            </summary>
+        </member>
+        <member name="P:AHpx.RG.TestLib.TestLib1.TestProperty1">
+            <summary>
+            tp1
+            </summary>
+        </member>
+        <member name="P:AHpx.RG.TestLib.TestLib1.TestProperty2">
+            <summary>
+            tp2
+            </summary>
+        </member>
+        <member name="P:AHpx.RG.TestLib.TestLib1.TestProperty3">
+            <summary>
+            tp3
+            </summary>
+        </member>
+        <member name="F:AHpx.RG.TestLib.TestLib1.TestField1">
+            <summary>
+            tp4
+            </summary>
+        </member>
+        <member name="F:AHpx.RG.TestLib.TestLib1.TestField2">
+            <summary>
+            tp5
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib1.#ctor(System.String,System.Collections.Generic.Dictionary{System.Int32,System.String})">
+            <summary>
+            this is a constructor
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib1.TestDelegate1">
+            <summary>
+            this is test delegate
+            </summary>
+        </member>
+        <member name="E:AHpx.RG.TestLib.TestLib1.TestEvent1">
+            <summary>
+            this is a test event
             </summary>
         </member>
         <member name="T:AHpx.RG.TestLib.TestLib2">
@@ -290,6 +329,12 @@
             <typeparam name="T1"></typeparam>
             <typeparam name="T2"></typeparam>
         </member>
+        <member name="M:AHpx.RG.TestLib.TestLib4`1.#ctor(`0)">
+            <summary>
+            this is constructor of testlib 4
+            </summary>
+            <param name="p1"></param>
+        </member>
         <member name="T:AHpx.RG.TestLib.TestLib5`3">
             <summary>
             testlib 5, multiple class-level type args
@@ -454,6 +499,26 @@
             t1
             </summary>
             <param name="p1"></param>
+        </member>
+        <member name="T:AHpx.RG.TestLib.TestLib9">
+            <summary>
+            testlib9, enumerate tests
+            </summary>
+        </member>
+        <member name="F:AHpx.RG.TestLib.TestLib9.Value1">
+            <summary>
+            this is value 1
+            </summary>
+        </member>
+        <member name="F:AHpx.RG.TestLib.TestLib9.Value2">
+            <summary>
+            v2
+            </summary>
+        </member>
+        <member name="F:AHpx.RG.TestLib.TestLib9.Value3">
+            <summary>
+            v3
+            </summary>
         </member>
     </members>
 </doc>
