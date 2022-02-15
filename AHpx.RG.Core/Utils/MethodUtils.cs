@@ -25,15 +25,21 @@ public static class MethodUtils
         return candidates;
     }
 
-    public static string GetSignature(this MethodInfo method)
+    public static string GetSignature<T>(this T info) where T : MethodBase
     {
-        var signature = $"{method.GetFullname()}";
+        var signature = string.Empty;
 
-        var parameters = method.GetParameters();
+        if (info is MethodInfo methodInfo)
+            signature = methodInfo.GetFullname();
+        if (info is ConstructorInfo constructorInfo)
+            signature = constructorInfo.GetFullname();
+
+        var parameters = info.GetParameters();
         if (parameters.Length != 0)
-            signature += $"({method.GetParameters().Select(p => p.GetSignature<MethodInfo>()).JoinToString(",")})";
+            signature +=
+                $"({info.GetParameters().Select(p => p.GetSignature<T>()).JoinToString(",")})";
 
-        return $"{method.GetSignaturePrefix()}{signature}";
+        return $"{info.GetSignaturePrefix()}{signature}";
     }
 
     public static string GetSignature<T>(this ParameterInfo parameterInfo) where T : MethodBase
@@ -53,20 +59,7 @@ public static class MethodUtils
         return $"{parameterType.GetFullname(false)}" +
                $"{{{parameterInfo.GetGenericParameterSignature(methodGenericArgs, typeGenericArgs)}}}";
     }
-    
-    
-    public static string GetSignature(this ConstructorInfo constructorInfo)
-    {
-        var signature = constructorInfo.GetFullname();
-        
-        var parameters = constructorInfo.GetParameters();
-        if (parameters.Length != 0)
-            signature +=
-                $"({constructorInfo.GetParameters().Select(p => p.GetSignature<ConstructorInfo>()).JoinToString(",")})";
 
-        return $"{constructorInfo.GetSignaturePrefix()}{signature}";
-    }
-    
     private static string GetGenericParameterSignature(this ParameterInfo parameterInfo, List<Type> methodGenericArgs, List<Type> typeGenericArgs)
     {
         var parameterType = parameterInfo.ParameterType;
