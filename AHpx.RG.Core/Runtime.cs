@@ -17,14 +17,6 @@ namespace AHpx.RG.Core
     {
         public static void Main()
         {
-
-            foreach (var memberInfo in typeof(TestLib1).GetMembers())
-            {
-                memberInfo.GetMemberSignature().CW();
-            }
-
-            return;
-            
             Global.Config = new GlobalConfig
             {
                 CompiledLibraryPath =
@@ -33,23 +25,11 @@ namespace AHpx.RG.Core
                     @"C:\Users\ahpx\source\repos\AHpx.RG\AHpx.RG.TestLib\bin\Debug\AHpx.RG.TestLib.xml"
             };
             
-            var types = typeof(TestLib2).Assembly.GetTypes().Where(x => x.Name.StartsWith("Test"));
+            var core = new ReadmeGeneratorCore();
             
-            foreach (var type in types)
-            {
-                foreach (var method in type.GetMethods().Where(x => x.IsPublic))
-                {
-                    var signature = method.GetSignature();
-                    var element = Global.XmlMembers
-                        .Select(x => x.Attribute("name")!.Value)
-                        .FirstOrDefault(x => x == signature, null);
-
-                    if (!element!.IsNullOrEmpty())
-                    {
-                        Console.WriteLine(element);
-                    }
-                }
-            }
+            var types = ReflectionUtils.GetTypes();
+            
+            Console.WriteLine(core.GetContent(types));
         }
 
         public static T CW<T>(this T o)

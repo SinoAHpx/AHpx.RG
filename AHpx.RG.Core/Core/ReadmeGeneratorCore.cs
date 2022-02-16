@@ -4,220 +4,169 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Xml.Linq;
 using AHpx.RG.Core.Utils;
+using Manganese.Array;
 using Manganese.Text;
 
 namespace AHpx.RG.Core.Core;
 
 public class ReadmeGeneratorCore
 {
-    #region Fields and properties
-
-    public string? CompiledDllPath { get; set; }
-
-    public string? XmlDocumentationPath { get; set; }
-
-    public List<Type>? Types => ReflectionUtils.GetTypes();
-
-    public XDocument XDocument => XDocument.Parse(File.ReadAllText(XmlDocumentationPath!));
-
-    private IEnumerable<XElement?> MemberElements => XDocument.Descendants("member");
-
-    #endregion
-
-    #region Checker
-
-    public bool HasSummary(Type type) =>
-        MemberElements
-            .Where(x => x!.Attribute("name")!.Value.StartsWith("T:"))
-            .Any(x => x!.Attribute("name")!.Value
-                .SubstringAfter("T:").Split(".")
-                .Last() == type.Name);
-
-    public bool HasSummary(MethodInfo methodInfo)
+    public string CompileLibraryPath
     {
-        var parameterTypes = methodInfo
-            .GetParameters()
-            .Select(x => x.ParameterType.FullName)
-            .ToList();
+        get => Global.Config.CompiledLibraryPath;
+        set => Global.Config.CompiledLibraryPath = value.ThrowIfNullOrEmpty("Library path cannot be null or empty.");
+    }
 
-        var signaure = $"{methodInfo.DeclaringType?.FullName}.{methodInfo?.Name}({parameterTypes.JoinToString(",")})";
+    public string XmlDocumentationPath
+    {
+        get => Global.Config.XmlDocumentationPath;
+        set => Global.Config.XmlDocumentationPath =
+            value.ThrowIfNullOrEmpty("Xml documentation path cannot be null or empty.");
+    }
 
+    private List<string> MarkdownLines { get; set; } = new();
+
+    public string GetContent(IEnumerable<Type> types, string? url = null)
+    {
+        foreach (var type in types)
+        {
+            MarkdownLines.Add(GenerateTypeContent(type, url));
+        }
+
+        return MarkdownLines.JoinToString(Environment.NewLine);
+    }
+
+    #region Type
+
+    private string GenerateTypeContent(Type type, string? appendix)
+    {
+        var readme = new StringBuilder();
+
+        if (appendix!.IsNullOrEmpty())
+            readme.AppendLine($"### {type.Name}");
+        else
+            readme.AppendLine($"[{type.Name}]({appendix})");
+
+        var element = type.GetElement();
+        if (element != null)
+            readme.AppendLine(ParseTypeSummary(element));
+
+        type.GetMembers().ToList().ForEach(m => readme.AppendLine(GenerateMemberContent(m)));
+
+        return readme.ToString();
+    }
+
+    private string GenerateMemberContent(MemberInfo memberInfo)
+    {
+        var readme = new StringBuilder();
+        var element = memberInfo.GetElement();
         
-        var candidates = MemberElements
-            .Where(x => x!.Attribute("name")!.Value.StartsWith("M:"))
-            .Where(x => x!.Attribute("name")!.Value.Contains(methodInfo.Name))
-            .ToList();
-
-        if(!candidates.Any())
-            return false;
-
-        if (candidates.Count == 1)
-            return true;
-
-        foreach (var candidate in candidates)
+        if (element != null)
         {
-            // var candidateName = candidate!.Attribute("name")!.Value;
-            // Console.WriteLine($"Signature: {signaure}");
-            // Console.WriteLine($"Candidate: {candidateName}");
-        }
-
-        return false;
-    }
-
-    private string GetMethodSignature(MethodInfo methodInfo)
-    {
-        var signature = $"{methodInfo.DeclaringType?.FullName}.{methodInfo.Name}";
-        if (methodInfo.IsGenericMethod)
-            signature += $"``{methodInfo.GetGenericArguments().Length}";
-
-        // methodInfo.GetParameters().Where(x => )
-        // methodInfo.GetParameters()
-        return null;
-    }
-
-    #endregion
-
-    #region Mapper
-
-    private XElement? Map(Type type)
-    {
-        try
-        {
-            var re = MemberElements
-                .Where(e => e?.Attribute("name")!.Value.StartsWith("T") is true)
-                .First(e => e?
-                    .Attribute("name")!.Value.SubstringAfter(":")
-                    .Split(".").Last() == type.Name);
-
-            return re;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private XElement? Map(MethodInfo method)
-    {
-        var candidates = MemberElements
-            .Where(e => e?.Attribute("name")?.Value.StartsWith("M") is true)
-            .Where(e => e?.Attribute("name")?.Value.Contains(method.Name) is true);
-
-        var paramInfos = method.GetParameters();
-
-        foreach (var candidate in candidates)
-        {
-            var paramNames = candidate?.Elements("param")
-                .Select(z => z.Attribute("name")?.Value);
-
-            if (paramInfos.Select(x => x.Name)
-                .All(x => paramNames?.Contains(x) is true))
+            switch (memberInfo.MemberType)
             {
-                return candidate;
+                case MemberTypes.Method when memberInfo is MethodInfo methodInfo:
+                    readme.AppendLine(ParseMethodSummary(element, methodInfo));
+                    break;
             }
         }
+        else
+        {
+            readme.AppendLine($"- ```{memberInfo.GetSignaturePrefix()}{memberInfo.Name}```");
+        }
 
-        throw new ArgumentException(
-            $"Method {method.Name} has no summary in {method.GetParameters().JoinToString(",")}");
-
-        // return null;
-    }
-
-    private XElement? Map(ParameterInfo parameter, MethodInfo methodInfo)
-    {
-        var methodElement = Map(methodInfo);
-
-        return methodElement?
-            .Elements("param")
-            .First(e => e.Attribute("name")?.Value == parameter.Name);
+        return readme.ToString();
     }
 
     #endregion
 
-    #region Generating markdown
+    #region Inline parsers
 
-    private string GetContent(Type type, string header)
+    private string ParseTypeSummary(XElement element)
     {
-        var typeElement = Map(type);
-        if (typeElement == null)
-            return string.Empty;
+        var re = new List<string>();
+        re.Add(GetSummaryContent(element, true));
 
-        var typeContent = new StringBuilder($"### {header}{Environment.NewLine}");
+        element.Elements()
+            .RemoveIf(x => x.Name.ToString() == "summary")
+            .ToList()
+            .ForEach(x => re.Add(GetElementContent(x)));
 
-        var typeSummaryElement = typeElement?.Element("summary");
-        var typeSummary = typeSummaryElement!.Value.Trim()
-            .Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None)
+        return re
             .Where(x => !x.IsNullOrEmpty())
-            .Select(x => x.Trim())
             .JoinToString(Environment.NewLine);
+    }
 
-        typeContent.Append(typeSummary);
-        typeContent.Append(Environment.NewLine);
+    private string ParseMethodSummary(XElement element, MethodInfo methodInfo)
+    {
+        var readme = new StringBuilder($"- ```{methodInfo.Name}({methodInfo.ReturnType.Name})```");
+        var summaryContent = GetSummaryContent(element);
+        if (!summaryContent.IsNullOrEmpty())
+            readme.Append($": {summaryContent}");
+        
+        var parameters = methodInfo.GetParameters();
+        var childElements = element.Elements();
 
-        var methods = type.GetMethods().Where(x => x.IsPublic);
-        foreach (var methodInfo in methods)
+        if (parameters.Length != 0)
         {
-            typeContent.Append(GetContent(methodInfo, type));
+            var mapped = parameters.Select(x =>
+            {
+                (ParameterInfo, XElement?) re;
+                var xElements = childElements.ToList();
+                if (x.Name.IsIn(xElements.Select(z => z.Attribute("name")?.Value)))
+                    re = (x, xElements.First(z => z.Attribute("name")?.Value == x.Name));
+                else
+                    re = (x, null);
+
+                return re;
+            });
+
+            foreach (var (parameterInfo, paramElement) in mapped)
+            {
+                readme.Append($"\t- ```{parameterInfo.Name}({parameterInfo.ParameterType.Name})```");
+
+                if (paramElement != null)
+                    readme.Append($": {paramElement.Value}");
+
+                readme.AppendLine();
+            }
         }
 
-        typeContent.Append(Environment.NewLine);
+        return readme.ToString();
+    }
+    
+    private string GetElementContent(XElement element, string? prefix = null)
+    {
+        var re = $"```{prefix}{element.Name.ToString().CapitalizeInitial()}```";
+        if (!element.Value.IsNullOrEmpty())
+            re += $": {element.Value}";
 
-        return typeContent.ToString().Split(Environment.NewLine).Where(x => !x.IsNullOrEmpty())
-            .JoinToString(Environment.NewLine);
+
+        return re;
     }
 
-    public string GetContent(Type type)
+    private string GetSummaryContent(XElement element, bool withChildren = false)
     {
-        return GetContent(type, type.Name);
-    }
-
-    public string GetContent(Type type, Uri uri)
-    {
-        var link = $"{uri}";
-
-        if (!link.EndsWith("/"))
-            link += "/";
-
-        return GetContent(type, $"[{type.Name}]({link}{type.Namespace?.Split(".").JoinToString("/")}/{type.Name}.cs)");
-    }
-
-    public string GetContent(MethodInfo methodInfo, Type type)
-    {
-        try
+        var summary = element.Element("summary");
+        var re = new StringBuilder();
+        
+        if (summary != null)
         {
-            var methodElement = Map(methodInfo);
-            var methodContent = new StringBuilder($"+ ```{methodInfo.Name}({methodInfo.ReturnType.Name})```: ");
-            methodContent.Append(methodElement?.Element("summary")?.Value.Trim());
-            methodContent.Append(Environment.NewLine);
-
-            foreach (var parameterInfo in methodInfo.GetParameters())
+            var toAdd = summary.Value.Trim();
+            if (summary.HasElements)
             {
-                methodContent.Append(GetContent(parameterInfo, methodInfo));
+                var toEmpty = summary.Elements().Select(x => x.Value.Trim()).JoinToString(string.Empty);
+                toAdd = toAdd.Empty(toEmpty);
             }
 
-            methodContent.Append(Environment.NewLine);
+            re.AppendLine(toAdd);
 
-            return methodContent.ToString();
+            if (withChildren)
+                summary.Elements().ToList().ForEach(x => re.AppendLine(GetElementContent(x)));
+
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            return string.Empty;
-        }
-    }
 
-    public string GetContent(ParameterInfo parameterInfo, MethodInfo methodInfo)
-    {
-        var parameterElement = Map(parameterInfo, methodInfo);
-        var parameterContent =
-            new StringBuilder($"\t+ ```{parameterInfo.Name}({parameterInfo.ParameterType.Name})```");
-
-        if (!parameterElement?.Value.IsNullOrEmpty() is true)
-            parameterContent.Append($": {parameterElement?.Value.Trim()}");
-
-        parameterContent.Append(Environment.NewLine);
-
-        return parameterContent.ToString();
+        return re.ToString();
     }
 
     #endregion

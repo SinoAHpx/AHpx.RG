@@ -6,7 +6,7 @@ namespace AHpx.RG.Core;
 
 public static class Global
 {
-    public static GlobalConfig Config { get; set; } = null!;
+    public static GlobalConfig Config { get; set; } = new();
 
     public static List<XElement> XmlMembers => XDocument
         .Parse(File.ReadAllText(Config.XmlDocumentationPath))

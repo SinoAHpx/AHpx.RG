@@ -99,6 +99,24 @@
             this is a test event
             </summary>
         </member>
+        <member name="T:AHpx.RG.TestLib.TestLib10">
+            <summary>
+            This is testlib10, complex marks test
+            <remarks>this is a remark</remarks>
+            <remarks>this is a remark2</remarks>
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib10.Test1">
+            <summary>
+            <seealso cref="M:AHpx.RG.TestLib.TestLib10.Test1(System.String)"/>
+            </summary>
+        </member>
+        <member name="M:AHpx.RG.TestLib.TestLib10.Test1(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="p1"></param>
+        </member>
         <member name="T:AHpx.RG.TestLib.TestLib2">
             <summary>
             This is test2, generic tests

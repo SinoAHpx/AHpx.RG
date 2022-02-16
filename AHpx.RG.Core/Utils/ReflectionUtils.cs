@@ -79,12 +79,10 @@ public static class ReflectionUtils
     
     public static XElement? GetElement(this MemberInfo memberInfo)
     {
-        
-        if (memberInfo.MemberType == MemberTypes.Method)
-        {
-            var method = memberInfo.GetMemberOf<MethodInfo>();
-        }
+        var signature = memberInfo.GetMemberSignature();
+        if (string.IsNullOrEmpty(signature))
+            return null;
 
-        return null;
+        return Global.XmlMembers.FirstOrDefault(x => x!.Attribute("name")!.Value == signature, null);
     }
 }

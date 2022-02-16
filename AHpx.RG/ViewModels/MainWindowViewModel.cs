@@ -158,24 +158,10 @@ namespace AHpx.RG.ViewModels
         {
             if (CompiledDllPath?.EndsWith(".dll") is true && XmlDocumentationPath?.EndsWith(".xml") is true)
             {
-                var core = new ReadmeGeneratorCore
-                {
-                    XmlDocumentationPath = XmlDocumentationPath,
-                    CompiledDllPath = CompiledDllPath
-                };
-                
                 var raw = LoadedTypes.Where(s => s.LoadedTypeSelected)
                     .Select(x => x.LoadedType);
-
-                string markdown;
-
-                if (RepositoryLink.IsNullOrEmpty())
-                    markdown = raw.Select(core.GetContent)
-                        .JoinToString(Environment.NewLine);
-                else
-                    markdown = raw.Select(x => core.GetContent(x, new Uri(RepositoryLink)))
-                        .JoinToString(Environment.NewLine);
-
+                var markdown = _core.GetContent(raw, RepositoryLink);
+                
                 PreviewerMarkdown = markdown;
             }
 
@@ -196,6 +182,8 @@ namespace AHpx.RG.ViewModels
 
         #endregion
 
+        private ReadmeGeneratorCore _core = new();
+        
         public MainWindowViewModel()
         {
             InitializeCommands();
@@ -203,8 +191,18 @@ namespace AHpx.RG.ViewModels
             this.WhenAnyValue(x => x.CompiledDllPath)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .DistinctUntilChanged()
-                .Where(x => x?.EndsWith(".dll") is true)
-                .InvokeCommand(RefreshLoadedTypesCommand!);
+                .Where(x => !x.IsNullOrEmpty())
+                .Subscribe(s =>
+                {
+                    _core.CompileLibraryPath = s;
+                    RefreshLoadedTypes(s);
+                });
+
+            this.WhenAnyValue(x => x.XmlDocumentationPath)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .DistinctUntilChanged()
+                .Where(x => !x.IsNullOrEmpty())
+                .Subscribe(s => _core.XmlDocumentationPath = s);
 
             this.WhenAnyValue(x => x.CompiledDllPath,
                     z => z.XmlDocumentationPath,
