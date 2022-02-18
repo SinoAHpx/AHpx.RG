@@ -160,7 +160,7 @@ namespace AHpx.RG.ViewModels
             {
                 var raw = LoadedTypes.Where(s => s.LoadedTypeSelected)
                     .Select(x => x.LoadedType);
-                var markdown = _core.GetContent(raw, RepositoryLink);
+                var markdown = _core.GetDocument(raw, RepositoryLink);
                 
                 PreviewerMarkdown = markdown;
             }
