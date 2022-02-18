@@ -19,6 +19,7 @@
     <PackageReference Include="Manganese" Version="1.2.0" />
     <PackageReference Include="Markdown.Avalonia" Version="0.10.10" />
     <PackageReference Include="Material.Avalonia" Version="2.5.0.72-nightly" />
+    <PackageReference Include="MessageBox.Avalonia" Version="1.8.1-night" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AHpx.RG.Core\AHpx.RG.Core.csproj" />

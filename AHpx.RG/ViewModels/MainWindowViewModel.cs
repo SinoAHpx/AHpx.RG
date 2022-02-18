@@ -13,9 +13,13 @@ using AHpx.RG.Core.Utils;
 using AHpx.RG.Services;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Manganese.Text;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
+using MessageBox.Avalonia;
+using MessageBox.Avalonia.DTO;
+using MessageBox.Avalonia.Models;
 
 namespace AHpx.RG.ViewModels
 {
@@ -154,15 +158,42 @@ namespace AHpx.RG.ViewModels
             set => this.RaiseAndSetIfChanged(ref _previewerMarkdown, value);
         }
 
-        private Unit RefreshPreviewer()
+        private async Task<Unit> RefreshPreviewer()
         {
             if (CompiledDllPath?.EndsWith(".dll") is true && XmlDocumentationPath?.EndsWith(".xml") is true)
             {
-                var raw = LoadedTypes.Where(s => s.LoadedTypeSelected)
-                    .Select(x => x.LoadedType);
-                var markdown = _core.GetDocument(raw, RepositoryLink);
+                try
+                {
+                    var raw = LoadedTypes.Where(s => s.LoadedTypeSelected)
+                        .Select(x => x.LoadedType);
+                    var markdown = _core.GetDocument(raw, RepositoryLink);
                 
-                PreviewerMarkdown = markdown;
+                    PreviewerMarkdown = markdown;
+                }
+                catch (Exception e)
+                {
+                    var result = await MessageBoxManager.GetMessageBoxCustomWindow(new MessageBoxCustomParams
+                        {
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            ContentHeader = "Oops",
+                            ContentTitle = "An exception occurred",
+                            ContentMessage = e.ToString(),
+                            MaxHeight = 300,
+                            MaxWidth = 600,
+                            SizeToContent = SizeToContent.Height, 
+                            ButtonDefinitions = new[]
+                            {
+                                new ButtonDefinition { Name = "Copy" },
+                                new ButtonDefinition { Name = "OK" },
+                            }
+                        })
+                        .ShowDialog(ServiceProvider.GetMainWindow());
+
+                    if (result == "Copy")
+                    {
+                        await Application.Current!.Clipboard!.SetTextAsync(e.ToString());
+                    }
+                }
             }
 
             return Unit.Default;
@@ -219,7 +250,7 @@ namespace AHpx.RG.ViewModels
 
             RefreshLoadedTypesCommand = ReactiveCommand.Create<string, Unit>(RefreshLoadedTypes);
             ToggleAllLoadedTypesCommand = ReactiveCommand.Create(ToggleAllLoadedTypes);
-            RefreshPreviewerCommand = ReactiveCommand.Create(RefreshPreviewer);
+            RefreshPreviewerCommand = ReactiveCommand.CreateFromTask(RefreshPreviewer);
         }
     }
 }

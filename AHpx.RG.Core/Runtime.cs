@@ -18,15 +18,6 @@ namespace AHpx.RG.Core
     {
         public static void Main()
         {
-            // var a = typeof(TestLib4<int>).GetGenericArguments();
-            //
-            // foreach (var type in a)
-            // {
-            //     Console.WriteLine(type);
-            // }
-            //
-            // return;
-            
             Global.Config = new GlobalConfig
             {
                 CompiledLibraryPath =
