@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Manganese" Version="1.2.0" />
-    <PackageReference Include="MarkdownTable" Version="0.1.0" />
+    <PackageReference Include="MarkdownBuilder" Version="0.2.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="6.0.2-mauipre.1.22054.8" />
   </ItemGroup>

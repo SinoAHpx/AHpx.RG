@@ -9,6 +9,7 @@ using AHpx.RG.Core.Utils;
 using AHpx.RG.TestLib;
 using Manganese.Array;
 using Manganese.Text;
+using Markdown;
 using Console = System.Console;
 
 namespace AHpx.RG.Core
@@ -17,6 +18,15 @@ namespace AHpx.RG.Core
     {
         public static void Main()
         {
+            // var a = typeof(TestLib4<int>).GetGenericArguments();
+            //
+            // foreach (var type in a)
+            // {
+            //     Console.WriteLine(type);
+            // }
+            //
+            // return;
+            
             Global.Config = new GlobalConfig
             {
                 CompiledLibraryPath =
@@ -28,8 +38,8 @@ namespace AHpx.RG.Core
             var core = new ReadmeGeneratorCore();
             
             var types = ReflectionUtils.GetTypes();
-            
-            Console.WriteLine(core.GetContent(types));
+
+            Console.WriteLine(core.GetDocument(types, ""));
         }
 
         public static T CW<T>(this T o)

@@ -3,9 +3,12 @@ using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Xml.Linq;
+using AHpx.RG.Core.Data;
 using AHpx.RG.Core.Utils;
+using Dawn;
 using Manganese.Array;
 using Manganese.Text;
+using Markdown;
 
 namespace AHpx.RG.Core.Core;
 
@@ -23,12 +26,128 @@ public class ReadmeGeneratorCore
         set => Global.Config.XmlDocumentationPath =
             value.ThrowIfNullOrEmpty("Xml documentation path cannot be null or empty.");
     }
+
+    public ReadmeGeneratorConfig GeneratorConfig { get; set; } = new();
     
+    #region General agent
+
+    public string GetDocument(IEnumerable<Type> types, string repositoryUrl)
+    {
+        var document = new StringBuilder();
+
+        foreach (var type in types)
+        {
+            document.AppendLine(GetTypeDocument(type, repositoryUrl));
+        }
+
+        return document.ToString();
+    }
+
+    #endregion
+
+    #region Chain
+
+    #region Type readme generator
+
+    private string GetTypeDocument(Type type, string url)
+    {
+        var document = new MarkdownDocument();
+        if (url.IsNullOrEmpty())
+            document.AppendHeader(type.Name, GeneratorConfig.TypeHeaderSize);
+        else
+            document.AppendHeader(new MarkdownLink(type.Name, url), GeneratorConfig.TypeHeaderSize);
+
+        document.AppendParagraph(GetTypeContent(type));
+
+        return document.ToString();
+    }
+
+    private string GetTypeContent(Type type)
+    {
+        var element = type.GetElement();
+        if (element == null)
+            return string.Empty;
+        
+        var builder = new StringBuilder();
+        
+        var summaryElement = element.Element("summary");
+        var summaryContent = GetTypeSummaryContent(summaryElement);
+        if (!summaryContent.IsNullOrEmpty())
+            builder.AppendLine(summaryContent);
+
+        var typeParamElements = element.Elements("typeparam").ToList();
+        if (typeParamElements.Count != 0)
+        {
+            builder.AppendLine(new MarkdownList(typeParamElements.Select(x =>
+            {
+                var re = $"```{x.Attribute("name")!.Value}```";
+                if (!x.Value.IsNullOrEmpty())
+                    re += $": {x.Value}";
+
+                return re;
+            }).ToArray()).ToString());
+        }
+
+        return builder.ToString();
+    }
+
+    private string GetTypeSummaryContent(XElement? summaryElement)
+    {
+        if (summaryElement == null)
+            return string.Empty;
+
+        var builder = new StringBuilder();
+        builder.AppendLine(GetTypeSummaryValue(summaryElement));
+
+        if (summaryElement.HasElements)
+        {
+            var subElements = summaryElement.Elements();
+            var toAppend = subElements.Select(GetTypeSubSummaryValue);
+
+            builder.AppendLine(new MarkdownList(toAppend.ToArray()).ToString());
+        }
+
+        return builder.ToString();
+    }
+    
+    private string GetTypeSummaryValue(XElement summaryElement)
+    {
+        var summaryValue = summaryElement.Value;
+        if (summaryElement.HasElements)
+        {
+            var subSummaryElementsValue = summaryElement.Elements()
+                .Select(x => x.Value).JoinToString("");
+            summaryValue = summaryValue.Empty(subSummaryElementsValue);
+        }
+
+        return summaryValue.Trim();
+    }
+
+    private string GetTypeSubSummaryValue(XElement subSummaryElement)
+    {
+        var listContent = $"{subSummaryElement.Name.ToString().CapitalizeInitial()}";
+
+        if (!subSummaryElement.Value.IsNullOrEmpty())
+            listContent += $": {subSummaryElement.Value.Trim()}";
+
+        return listContent;
+    }
+
+    #endregion
+
+    #region Methods readme generator
+
+    
+
+    #endregion
+
+    #endregion
+
     
 
     // private List<string> MarkdownLines { get; set; } = new();
     //
-    // public string GetContent(IEnumerable<Type> types, string? url = null)
+    // public string GetTypeContent(IEnumerable<Type> types, string? url = null)
     // {
     //     foreach (var type in types)
     //     {
@@ -87,7 +206,7 @@ public class ReadmeGeneratorCore
     // private string ParseTypeSummary(XElement element)
     // {
     //     var re = new List<string>();
-    //     re.Add(GetSummaryContent(element, true));
+    //     re.Add(GetTypeSummaryContent(element, true));
     //
     //     element.Elements()
     //         .RemoveIf(x => x.Name.ToString() == "summary")
@@ -102,7 +221,7 @@ public class ReadmeGeneratorCore
     // private string ParseMethodSummary(XElement element, MethodInfo methodInfo)
     // {
     //     var readme = new StringBuilder($"- ```{methodInfo.Name}({methodInfo.ReturnType.Name})```");
-    //     var summaryContent = GetSummaryContent(element);
+    //     var summaryContent = GetTypeSummaryContent(element);
     //     if (!summaryContent.IsNullOrEmpty())
     //         readme.Append($": {summaryContent}");
     //     
@@ -147,9 +266,9 @@ public class ReadmeGeneratorCore
     //     return re;
     // }
     //
-    // private string GetSummaryContent(XElement element, bool withChildren = false)
+    // private string GetTypeSummaryContent(XElement element, bool withChildren = false)
     // {
-    //     var summary = element.Element("summary");
+    //     var summary = element.ElementBase("summary");
     //     var re = new StringBuilder();
     //     
     //     if (summary != null)
