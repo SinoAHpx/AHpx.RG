@@ -36,11 +36,14 @@ public class ReadmeGeneratorCore
         var document = new StringBuilder();
 
         foreach (var type in types)
-        {
             document.AppendLine(GetTypeDocument(type, repositoryUrl));
-        }
-
-        return document.ToString();
+        
+        var re = document.ToString();
+        re = re.Split(Environment.NewLine)
+            .Where(s => !s.IsNullOrEmpty())
+            .JoinToString(Environment.NewLine);
+        
+        return re;
     }
 
     #endregion
@@ -58,6 +61,12 @@ public class ReadmeGeneratorCore
             document.AppendHeader(new MarkdownLink(type.Name, url), GeneratorConfig.TypeHeaderSize);
 
         document.AppendParagraph(GetTypeContent(type));
+
+        var members = type.GetMembers()
+            .Where(x => x.MemberType != MemberTypes.NestedType)
+            .ToList();
+        document.AppendParagraph(ShuntMembersDocument(members));
+            
 
         return document.ToString();
     }
@@ -97,7 +106,7 @@ public class ReadmeGeneratorCore
             return string.Empty;
 
         var builder = new StringBuilder();
-        builder.AppendLine(GetTypeSummaryValue(summaryElement));
+        builder.AppendLine(GetPureSummaryValue(summaryElement));
 
         if (summaryElement.HasElements)
         {
@@ -108,19 +117,6 @@ public class ReadmeGeneratorCore
         }
 
         return builder.ToString();
-    }
-    
-    private string GetTypeSummaryValue(XElement summaryElement)
-    {
-        var summaryValue = summaryElement.Value;
-        if (summaryElement.HasElements)
-        {
-            var subSummaryElementsValue = summaryElement.Elements()
-                .Select(x => x.Value).JoinToString("");
-            summaryValue = summaryValue.Empty(subSummaryElementsValue);
-        }
-
-        return summaryValue.Trim();
     }
 
     private string GetTypeSubSummaryValue(XElement subSummaryElement)
@@ -135,14 +131,139 @@ public class ReadmeGeneratorCore
 
     #endregion
 
+    #region Shunter
+
+    private string ShuntMembersDocument(List<MemberInfo> memberInfos)
+    {
+        var builder = new StringBuilder();
+        
+        //constructors
+        
+        //properties
+        
+        //events
+        
+        //methods
+        var methods = memberInfos
+            .OfType<MethodInfo>()
+            .Where(m => m.IsPublic)
+            .Where(m => m.DeclaringType != typeof(object))
+            .Where(m => m.DeclaringType != typeof(Enum))
+            .Where(IsNotGetterOrSetter)
+            .Where(IsNotAdderOrRemover)
+            .ToList();
+
+        
+        
+        if (methods.Any())
+            builder.AppendLine(GetMemberDocument(methods, GetMethodDocument));
+
+        //fields
+
+        return builder.ToString();
+    }
+
+    private string GetMemberDocument<T>(IEnumerable<T> memberInfos, Func<T, string> handler) where T : MemberInfo
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine(new MarkdownHeader(typeof(T).Name.Empty("Info") + "s", GeneratorConfig.TypeSubtitleSize)
+            .ToString());
+
+        foreach (var methodInfo in memberInfos)
+            builder.AppendLine(handler(methodInfo));
+
+        return builder.ToString();
+    }
+    
     #region Methods readme generator
 
+    private string GetMethodDocument(MethodInfo methodInfo)
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine($"- {GetMethodContent(methodInfo)}");
+
+        return builder.ToString();
+    }
+
+    private string GetMethodContent(MethodInfo methodInfo)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append($"```{methodInfo.Name}");
+        if (methodInfo.ReturnType == typeof(void))
+            builder.Append("```");
+        else
+            builder.Append($"({methodInfo.ReturnType.Name})```");
+
+        var methodElement = methodInfo.GetElement();
+
+        var summaryElement = methodElement?.Element("summary");
+        if (summaryElement != null)
+        {
+            var pureSummaryValue = GetPureSummaryValue(summaryElement);
+            if (!pureSummaryValue.IsNullOrEmpty())
+                builder.Append($": {GetPureSummaryValue(summaryElement)}");
+        }
+
+        return builder.ToString();
+    }
+
+    #endregion
+
+    #endregion
+    
     
 
     #endregion
 
-    #endregion
+    #region Helpers
 
+    /// <summary>
+    /// Get summary value without value from children element
+    /// </summary>
+    /// <param name="summaryElement"></param>
+    /// <returns></returns>
+    private string GetPureSummaryValue(XElement summaryElement)
+    {
+        var summaryValue = summaryElement.Value;
+
+        if (summaryValue.IsNullOrEmpty())
+            goto re;
+
+        if (summaryElement.HasElements)
+        {
+            var subSummaryElementsValue = summaryElement.Elements()
+                .Select(x => x.Value).JoinToString("");
+            summaryValue = summaryValue.Empty(subSummaryElementsValue);
+        }
+
+        re:
+        return summaryValue.Trim();
+    }
+
+    private bool IsNotGetterOrSetter(MethodInfo methodInfo)
+    {
+        var type = methodInfo.DeclaringType!;
+        //1: get 2: set
+        var properties = type.GetProperties()
+            .Select(p => (p.GetGetMethod(), p.GetSetMethod()));
+
+        return !properties.Any(x => x.Item1 == methodInfo || x.Item2 == methodInfo);
+    }
+
+    private bool IsNotAdderOrRemover(MethodInfo methodInfo)
+    {
+        var type = methodInfo.DeclaringType!;
+        //1: add 2: remove
+        var events = type.GetEvents()
+            .Select(p => (p.GetAddMethod(), p.GetRemoveMethod()));
+        
+        return !events.Any(x => x.Item1 == methodInfo || x.Item2 == methodInfo);
+    }
+
+    #endregion
     
 
     // private List<string> MarkdownLines { get; set; } = new();
