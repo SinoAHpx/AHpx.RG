@@ -181,13 +181,19 @@ public class ReadmeGeneratorCore
     private string GetMethodDocument(MethodInfo methodInfo)
     {
         var builder = new StringBuilder();
+        var methodElement = methodInfo.GetElement();
 
-        builder.AppendLine($"- {GetMethodContent(methodInfo)}");
+        builder.AppendLine($"- {GetMethodContent(methodInfo, methodElement)}");
 
+        var parameters = methodInfo.GetParameters().ToList();
+        if (parameters.Count != 0)
+            foreach (var parameterInfo in parameters)
+                builder.AppendLine($"\t- {GetParameterDocument(parameterInfo, methodElement)}");
+        
         return builder.ToString();
     }
 
-    private string GetMethodContent(MethodInfo methodInfo)
+    private string GetMethodContent(MethodInfo methodInfo, XElement? methodElement)
     {
         var builder = new StringBuilder();
 
@@ -197,14 +203,34 @@ public class ReadmeGeneratorCore
         else
             builder.Append($"({methodInfo.ReturnType.Name})```");
 
-        var methodElement = methodInfo.GetElement();
-
         var summaryElement = methodElement?.Element("summary");
         if (summaryElement != null)
         {
             var pureSummaryValue = GetPureSummaryValue(summaryElement);
             if (!pureSummaryValue.IsNullOrEmpty())
                 builder.Append($": {GetPureSummaryValue(summaryElement)}");
+        }
+
+        return builder.ToString();
+    }
+
+    private string GetParameterDocument(ParameterInfo parameterInfo, XElement? methodElement)
+    {
+        var builder = new StringBuilder();
+        builder.Append($"```{parameterInfo.Name}({parameterInfo.ParameterType.Name})```");
+
+        if (methodElement != null)
+        {
+            var paramElements = methodElement.Elements("param").ToList();
+
+            if (paramElements.Any())
+            {
+                var paraElement =
+                    paramElements.FirstOrDefault(x => x!.Attribute("name")!.Value == parameterInfo.Name, null);
+
+                if (paraElement != null && !paraElement.Value.IsNullOrEmpty())
+                    builder.Append($": {paraElement.Value}");
+            }
         }
 
         return builder.ToString();
