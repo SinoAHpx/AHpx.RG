@@ -1,12 +1,8 @@
-﻿using System.Collections.Immutable;
-using System.Reflection;
-using System.Reflection.PortableExecutable;
+﻿using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using AHpx.RG.Core.Data;
 using AHpx.RG.Core.Utils;
-using Dawn;
-using Manganese.Array;
 using Manganese.Text;
 using Markdown;
 
@@ -138,12 +134,46 @@ public class ReadmeGeneratorCore
         var builder = new StringBuilder();
         
         //constructors
-        
+        var constructors = memberInfos
+            .OfType<ConstructorInfo>()
+            .Where(c => c.IsPublic)
+            .Where(m => m.DeclaringType != typeof(object))
+            .Where(m => m.DeclaringType != typeof(Enum))
+            .ToList();
+
+        if (constructors.Any())
+            builder.AppendLine(GetMemberDocument(constructors, GetConstructorDocument));
+
         //properties
+
+        var properties = memberInfos
+            .OfType<PropertyInfo>()
+            .Where(p => p.GetMethod?.IsPublic is true || p.SetMethod?.IsPublic is true)
+            .ToList();
+
+        if (properties.Any())
+            builder.AppendLine(GetMemberDocument(properties, GetPropertyDocument));
+        
+        //fields
+        var fields = memberInfos
+            .OfType<FieldInfo>()
+            .Where(f => f.IsPublic)
+            .ToList();
+        
+        if (fields.Any())
+            builder.AppendLine(GetMemberDocument(fields, GetFieldDocument));
         
         //events
         
-        //methods
+        var events = memberInfos
+            .OfType<EventInfo>()
+            .Where(e => e.AddMethod?.IsPublic is true || e.RemoveMethod?.IsPublic is true)
+            .ToList();
+
+        if (events.Any())
+            builder.AppendLine(GetMemberDocument(events, GetEventDocument));
+
+            //methods
         var methods = memberInfos
             .OfType<MethodInfo>()
             .Where(m => m.IsPublic)
@@ -152,13 +182,9 @@ public class ReadmeGeneratorCore
             .Where(IsNotGetterOrSetter)
             .Where(IsNotAdderOrRemover)
             .ToList();
-
-        
         
         if (methods.Any())
             builder.AppendLine(GetMemberDocument(methods, GetMethodDocument));
-
-        //fields
 
         return builder.ToString();
     }
@@ -230,6 +256,80 @@ public class ReadmeGeneratorCore
 
                 if (paraElement != null && !paraElement.Value.IsNullOrEmpty())
                     builder.Append($": {paraElement.Value}");
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    #endregion
+
+    #region Constructors readme generator
+
+    private string GetConstructorDocument(ConstructorInfo constructorInfo)
+    {
+        var builder = new StringBuilder();
+
+        var constructorElement = constructorInfo.GetElement();
+        builder.AppendLine($"- {GetConstructorContent(constructorElement)}");
+        
+        var parameters = constructorInfo.GetParameters().ToList();
+        if (parameters.Count != 0)
+            foreach (var parameterInfo in parameters)
+                builder.AppendLine($"\t- {GetParameterDocument(parameterInfo, constructorElement)}");
+
+        return builder.ToString();
+    }
+
+    private string GetConstructorContent(XElement? constructorElement)
+    {
+        var builder = new StringBuilder();
+        builder.Append($"Constructor");
+        
+        var summaryElement = constructorElement?.Element("summary");
+        if (summaryElement != null)
+        {
+            var pureSummaryValue = GetPureSummaryValue(summaryElement);
+            if (!pureSummaryValue.IsNullOrEmpty())
+                builder.Append($": {GetPureSummaryValue(summaryElement)}");
+        }
+
+        return builder.ToString();
+    }
+
+    #endregion
+
+    #region General member readme generator
+
+    private string GetPropertyDocument(PropertyInfo propertyInfo)
+    {
+        return GetRegularMemberDocument($"{propertyInfo.Name}({propertyInfo.PropertyType.Name})", propertyInfo);
+    }
+
+    private string GetFieldDocument(FieldInfo fieldInfo)
+    {
+        return GetRegularMemberDocument($"{fieldInfo.Name}({fieldInfo.FieldType.Name})", fieldInfo);
+    }
+    
+    private string GetEventDocument(EventInfo eventInfo)
+    {
+        return GetRegularMemberDocument($"{eventInfo.Name}({eventInfo.EventHandlerType?.Name ?? "object"})", eventInfo);
+    }
+
+    private string GetRegularMemberDocument(string header, MemberInfo memberInfo)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine($"- ```{header}```");
+        
+        var memberElement = memberInfo.GetElement();
+        if (memberElement != null)
+        {
+            var summaryElement = memberElement.Element("summary");
+            if (summaryElement != null)
+            {
+                var pureSummaryValue = GetPureSummaryValue(summaryElement);
+                if (!pureSummaryValue.IsNullOrEmpty())
+                    builder.AppendLine($"\t- {GetPureSummaryValue(summaryElement)}");
             }
         }
 
