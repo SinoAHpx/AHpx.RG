@@ -70,6 +70,7 @@ public class ReadmeGeneratorCore
 
         var members = type.GetMembers()
             .Where(x => x.MemberType != MemberTypes.NestedType)
+            .Where(x => x.Name != "value__")
             .ToList();
         document.AppendParagraph(ShuntMembersDocument(members, type));
             
