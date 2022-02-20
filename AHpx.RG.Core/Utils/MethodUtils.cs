@@ -25,7 +25,7 @@ public static class MethodUtils
         return candidates;
     }
 
-    public static string GetSignature<T>(this T info) where T : MethodBase
+    public static string GetSignature<T>(this T info) where T : MethodBase?
     {
         var signature = string.Empty;
 

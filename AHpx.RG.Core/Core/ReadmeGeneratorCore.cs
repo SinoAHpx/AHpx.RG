@@ -71,7 +71,7 @@ public class ReadmeGeneratorCore
         var members = type.GetMembers()
             .Where(x => x.MemberType != MemberTypes.NestedType)
             .ToList();
-        document.AppendParagraph(ShuntMembersDocument(members));
+        document.AppendParagraph(ShuntMembersDocument(members, type));
             
 
         return document.ToString();
@@ -139,16 +139,15 @@ public class ReadmeGeneratorCore
 
     #region Shunter
 
-    private string ShuntMembersDocument(List<MemberInfo> memberInfos)
+    private string ShuntMembersDocument(List<MemberInfo> memberInfos, Type declaringType)
     {
         var builder = new StringBuilder();
         
         //constructors
-        var constructors = memberInfos
+        var constructors = memberInfos.ToList()
             .OfType<ConstructorInfo>()
             .Where(c => c.IsPublic)
-            .Where(m => m.DeclaringType != typeof(object))
-            .Where(m => m.DeclaringType != typeof(Enum))
+            .Where(m => m.DeclaringType == declaringType)
             .ToList();
 
         if (constructors.Any())
@@ -156,7 +155,7 @@ public class ReadmeGeneratorCore
 
         //properties
 
-        var properties = memberInfos
+        var properties = memberInfos.ToList()
             .OfType<PropertyInfo>()
             .Where(p => p.GetMethod?.IsPublic is true || p.SetMethod?.IsPublic is true)
             .ToList();
@@ -165,7 +164,7 @@ public class ReadmeGeneratorCore
             builder.AppendLine(GetMemberDocument(properties, GetPropertyDocument));
         
         //fields
-        var fields = memberInfos
+        var fields = memberInfos.ToList()
             .OfType<FieldInfo>()
             .Where(f => f.IsPublic)
             .ToList();
@@ -175,7 +174,7 @@ public class ReadmeGeneratorCore
         
         //events
         
-        var events = memberInfos
+        var events = memberInfos.ToList()
             .OfType<EventInfo>()
             .Where(e => e.AddMethod?.IsPublic is true || e.RemoveMethod?.IsPublic is true)
             .ToList();
@@ -183,12 +182,11 @@ public class ReadmeGeneratorCore
         if (events.Any())
             builder.AppendLine(GetMemberDocument(events, GetEventDocument));
 
-            //methods
-        var methods = memberInfos
+        //methods
+        var methods = memberInfos.ToList()
             .OfType<MethodInfo>()
             .Where(m => m.IsPublic)
-            .Where(m => m.DeclaringType != typeof(object))
-            .Where(m => m.DeclaringType != typeof(Enum))
+            .Where(m => m.DeclaringType == declaringType)
             .Where(IsNotGetterOrSetter)
             .Where(IsNotAdderOrRemover)
             .ToList();
@@ -332,15 +330,12 @@ public class ReadmeGeneratorCore
         builder.AppendLine($"- ```{header}```");
         
         var memberElement = memberInfo.GetElement();
-        if (memberElement != null)
+        var summaryElement = memberElement?.Element("summary");
+        if (summaryElement != null)
         {
-            var summaryElement = memberElement.Element("summary");
-            if (summaryElement != null)
-            {
-                var pureSummaryValue = GetPureSummaryValue(summaryElement);
-                if (!pureSummaryValue.IsNullOrEmpty())
-                    builder.AppendLine($"\t- {GetPureSummaryValue(summaryElement)}");
-            }
+            var pureSummaryValue = GetPureSummaryValue(summaryElement);
+            if (!pureSummaryValue.IsNullOrEmpty())
+                builder.AppendLine($"\t- {GetPureSummaryValue(summaryElement)}");
         }
 
         return builder.ToString();
