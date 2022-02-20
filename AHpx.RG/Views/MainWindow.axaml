@@ -25,55 +25,85 @@
             <!-- splitter -->
             <Rectangle Height="1" Fill="Gray" />
 
-            <!-- load dll -->
-            <StackPanel Margin="0,10,0,0">
-                <TextBlock Text="Compiled dll path" />
-                <TextBox Margin="0,10,0,0"
-                         Watermark="/bin/Debug/net6.0/xxx.dll"
-                         ToolTip.Tip="Drag file into or browser manually"
-                         Text="{Binding CompiledDllPath}" />
+            <Expander Header="Config" IsExpanded="True">
+                <StackPanel Margin="10">
+                    <!-- load dll -->
+                    <StackPanel Margin="0,10,0,0">
+                        <TextBlock Text="Compiled dll path" />
+                        <TextBox Margin="0,10,0,0"
+                                 Watermark="/bin/Debug/net6.0/xxx.dll"
+                                 ToolTip.Tip="Drag file into or browser manually"
+                                 Text="{Binding CompiledDllPath}" />
 
-                <Button Content="Browse" Command="{Binding BrowseDllCommand}" Margin="0,10,0,0"
-                        HorizontalAlignment="Right" />
-            </StackPanel>
+                        <Button Content="Browse" Command="{Binding BrowseDllCommand}" Margin="0,10,0,0"
+                                HorizontalAlignment="Right" />
+                    </StackPanel>
 
-            <!-- load xml documentation -->
-            <StackPanel Margin="0,10,0,0">
-                <TextBlock Text="Xml documentation path" />
-                <TextBox Margin="0,10,0,0"
-                         Watermark="/bin/Debug/xxx.xml"
-                         ToolTip.Tip="Drag file into or browser manually"
-                         Text="{Binding XmlDocumentationPath}" />
+                    <!-- load xml documentation -->
+                    <StackPanel Margin="0,10,0,0">
+                        <TextBlock Text="Xml documentation path" />
+                        <TextBox Margin="0,10,0,0"
+                                 Watermark="/bin/Debug/xxx.xml"
+                                 ToolTip.Tip="Drag file into or browser manually"
+                                 Text="{Binding XmlDocumentationPath}" />
 
-                <Button Content="Browse" Command="{Binding BrowseXmlCommand}" Margin="0,10,0,0"
-                        HorizontalAlignment="Right" />
-            </StackPanel>
+                        <Button Content="Browse" Command="{Binding BrowseXmlCommand}" Margin="0,10,0,0"
+                                HorizontalAlignment="Right" />
+                    </StackPanel>
 
-            <!-- repo link -->
-            <StackPanel Margin="0,10,0,0">
-                <TextBlock Text="Repository tree link"/>
-                <TextBox Margin="0,10,0,0"
-                         Watermark="A repository tree link is optional, and if will be used as the header of each type in markdown"
-                         ToolTip.Tip="Don't care about /"
-                         Text="{Binding RepositoryLink}" />
-            </StackPanel>
+                    <!-- repo link -->
+                    <StackPanel Margin="0,10,0,0">
+                        <TextBlock Text="Repository tree link"/>
+                        <TextBox Margin="0,10,0,0"
+                                 Watermark="A repository tree link is optional, and if will be used as the header of each type in markdown"
+                                 ToolTip.Tip="Don't care about /"
+                                 Text="{Binding RepositoryLink}" />
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+
+            <Expander Margin="0,10,0,0" Header="Dependency libraries" ToolTip.Tip="Add them if an exception has been thrown">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Dependency path"/>
+                    <TextBox Text="{Binding DependencyPath}"/>
+                    <Button Content="Browse" HorizontalAlignment="Right" Command="{Binding BrowseDependencyCommand}"/>
+
+                    <StackPanel>
+						<ItemsControl Margin="0,10,0,0"
+                                      Items="{Binding LoadedLibraries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <styles:Card Height="50">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </styles:Card>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
 
             <!-- types in loaded dll -->
             <StackPanel Margin="0,10,0,0" IsVisible="{Binding LoadedTypes.Count}">
-                <TextBlock Text="Types" />
-                <ItemsControl Margin="0,10,0,0"
-                              Items="{Binding LoadedTypes}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <styles:Card Height="50">
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding LoadedTypeSelected}" />
-                                    <TextBlock Text="{Binding LoadedType.FullName}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </styles:Card>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <Expander Header="Types" Margin="0,10,0,0">
+                    <ItemsControl Margin="0,10,0,0"
+                                  Items="{Binding LoadedTypes}"
+                                  >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <styles:Card Height="50">
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding LoadedTypeSelected}" />
+                                        <TextBlock Text="{Binding LoadedType.FullName}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </styles:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Expander>
+                
 
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,10,0,0">
                     <Button Content="Select/Deselect all" Margin="0,0,10,0"

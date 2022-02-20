@@ -17,7 +17,11 @@ public class LoadedTypeViewModel : ViewModelBase
     public bool LoadedTypeSelected
     {
         get => _loadedTypeSelected;
-        set => this.RaiseAndSetIfChanged(ref _loadedTypeSelected, value);
+        set
+        {
+            MessageBus.Current.SendMessage(this);
+            this.RaiseAndSetIfChanged(ref _loadedTypeSelected, value);
+        }
     }
 
     public LoadedTypeViewModel(Type loadedType = null, bool loadedTypeSelected = default)
