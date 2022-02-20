@@ -20,6 +20,7 @@ using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 using MessageBox.Avalonia;
 using MessageBox.Avalonia.DTO;
+using MessageBox.Avalonia.Enums;
 using MessageBox.Avalonia.Models;
 
 namespace AHpx.RG.ViewModels
@@ -177,12 +178,19 @@ namespace AHpx.RG.ViewModels
 
         private async Task<Unit> RefreshPreviewer()
         {
-            await Task.Run(async () =>
+            try
             {
-                if (_libraryExtensions.Any(e => CompiledDllPath?.EndsWith(e) is true)
-                    && XmlDocumentationPath?.EndsWith(".xml") is true)
+                await Task.Run(async () =>
                 {
-                    try
+                    // var dialogResult = ButtonResult.Yes;
+                    // if (XmlDocumentationPath?.EndsWith(".xml") is false)
+                    // {
+                    //     dialogResult = await MessageBoxManager
+                    //         .GetMessageBoxStandardWindow("Waning", "Xml documentation is not specified, sure about continue with that?", ButtonEnum.YesNo)
+                    //         .ShowDialog(ServiceProvider.GetMainWindow());
+                    // }
+                    if (_libraryExtensions.Any(e => CompiledDllPath?.EndsWith(e) is true)
+                        && XmlDocumentationPath?.EndsWith(".xml") is true)
                     {
                         var raw = LoadedTypes.Where(s => s.LoadedTypeSelected)
                             .Select(x => x.LoadedType);
@@ -190,33 +198,18 @@ namespace AHpx.RG.ViewModels
 
                         PreviewerMarkdown = markdown;
                     }
-                    catch (Exception e)
-                    {
-                        var result = await MessageBoxManager.GetMessageBoxCustomWindow(new MessageBoxCustomParams
-                            {
-                                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                                ContentHeader = "Oops",
-                                ContentTitle = "An exception occurred",
-                                ContentMessage = e.ToString(),
-                                MaxHeight = 300,
-                                MaxWidth = 600,
-                                SizeToContent = SizeToContent.Height,
-                                ButtonDefinitions = new[]
-                                {
-                                    new ButtonDefinition { Name = "Copy" },
-                                    new ButtonDefinition { Name = "OK" },
-                                }
-                            })
-                            .ShowDialog(ServiceProvider.GetMainWindow());
+                });
+            }
+            catch (Exception e)
+            {
+                var result = await ServiceProvider.PromptExceptionDialog(e);
 
-                        if (result == "Copy")
-                        {
-                            await Application.Current!.Clipboard!.SetTextAsync(e.ToString());
-                        }
-                    }
+                if (result == "Copy")
+                {
+                    await Application.Current!.Clipboard!.SetTextAsync(e.ToString());
                 }
-            });
-            
+            }
+
             return Unit.Default;
         }
 
@@ -229,7 +222,11 @@ namespace AHpx.RG.ViewModels
         public string RepositoryLink
         {
             get => _repositoryLink;
-            set => this.RaiseAndSetIfChanged(ref _repositoryLink, value);
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _repositoryLink, value);
+                RefreshPreviewer();
+            }
         }
 
         #endregion
@@ -245,16 +242,18 @@ namespace AHpx.RG.ViewModels
         }
 
         public ReactiveCommand<Unit, Unit> BrowseDependencyCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ReloadDependencyCommand { get; set; }
 
-        public ObservableCollection<string> LoadedLibraries { get; set; }
 
+
+        public ObservableCollection<LoadedLibraryViewModel> LoadedLibraries { get; set; } = new();
 
         private async Task BrowseDependency()
         {
             var dialog = new OpenFileDialog
             {
-                Title = "Select your compiled CLR library file",
-                AllowMultiple = false,
+                Title = "Select your compiled CLR library files",
+                AllowMultiple = true,
                 Filters = new List<FileDialogFilter>()
                 {
                     new()
@@ -266,8 +265,22 @@ namespace AHpx.RG.ViewModels
             var file = await dialog.ShowAsync(ServiceProvider.GetMainWindow());
 
             if (file?.Any() is true)
-                LoadedLibraries.Add(file.First());
+                foreach (var s in file)
+                {
+                    LoadedLibraries.Add(new LoadedLibraryViewModel(true, s));
+                    ReflectionUtils.LoadContext.LoadFromAssemblyPath(s);
+                }
+        }
 
+        private void ReloadDependency()
+        {
+            if (LoadedLibraries.Any(x => x.LoadedLibrarySelected))
+            {
+                ReflectionUtils
+                    .ReloadDependency(LoadedLibraries
+                        .Where(x => x.LoadedLibrarySelected)
+                        .Select(x => x.LoadedLibraryType));
+            }
         }
 
         #endregion
@@ -294,20 +307,10 @@ namespace AHpx.RG.ViewModels
                 .Where(x => !x.IsNullOrEmpty())
                 .Subscribe(s => _core.XmlDocumentationPath = s);
 
-            this.WhenAnyValue(x => x.CompiledDllPath,
-                    z => z.XmlDocumentationPath,
-                    y => y.RepositoryLink)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .DistinctUntilChanged()
-                .Subscribe(async _ => await RefreshPreviewer());
-
-            // this.WhenAnyValue(x => x.LoadedTypesBridge)
-            //     .ObserveOn(RxApp.MainThreadScheduler)
-            //     .DistinctUntilChanged()
-            //     .Subscribe(async _ => await RefreshPreviewer());
-
-            MessageBus.Current
+            ServiceProvider.MessageBus
                 .Listen<LoadedTypeViewModel>()
+                .Throttle(TimeSpan.FromSeconds(1))
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(async _ => await RefreshPreviewer());
         }
 
@@ -321,6 +324,8 @@ namespace AHpx.RG.ViewModels
             RefreshPreviewerCommand = ReactiveCommand.CreateFromTask(RefreshPreviewer);
 
             BrowseDependencyCommand = ReactiveCommand.CreateFromTask(BrowseDependency);
+            ReloadDependencyCommand = ReactiveCommand.Create(ReloadDependency);
+
         }
     }
 }

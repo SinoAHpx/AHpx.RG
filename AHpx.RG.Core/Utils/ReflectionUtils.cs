@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using AHpx.RG.TestLib;
@@ -9,6 +10,8 @@ namespace AHpx.RG.Core.Utils;
 
 public static class ReflectionUtils
 {
+    public static AssemblyLoadContext LoadContext { get; set; } = new("default-context", true);
+
     /// <summary>
     /// Get public types from compiled library
     /// </summary>
@@ -18,7 +21,7 @@ public static class ReflectionUtils
         var types = new List<Type>();
         try
         {
-            var assembly = Assembly.LoadFile(Global.Config.CompiledLibraryPath);
+            var assembly = LoadContext.LoadFromAssemblyPath(Global.Config.CompiledLibraryPath);
             types.AddRange(assembly.GetTypes());
         }
         catch (ReflectionTypeLoadException e)
@@ -28,6 +31,21 @@ public static class ReflectionUtils
 
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         return types.Where(x => x != null).Where(x => x.IsPublic).ToList();
+    }
+
+    public static void LoadDependency(IEnumerable<string> dependencyPaths)
+    {
+        foreach (var path in dependencyPaths.Where(s => !s.IsNullOrEmpty()))
+        {
+            LoadContext.LoadFromAssemblyPath(path);
+        }
+    }
+
+    public static void ReloadDependency(IEnumerable<string> toReload)
+    {
+        LoadContext = new AssemblyLoadContext("reload-context", true);
+
+        LoadDependency(toReload);
     }
 
     public static T? GetMemberOf<T>(this MemberInfo memberInfo) where T : MemberInfo

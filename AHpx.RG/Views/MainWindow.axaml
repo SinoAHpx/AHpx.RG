@@ -66,7 +66,12 @@
                 <StackPanel Margin="10">
                     <TextBlock Text="Dependency path"/>
                     <TextBox Text="{Binding DependencyPath}"/>
-                    <Button Content="Browse" HorizontalAlignment="Right" Command="{Binding BrowseDependencyCommand}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Reload" ToolTip.Tip="Reload selected library and unload unselected ones" 
+                                Margin="0,0,5,0" 
+                                Command="{Binding ReloadDependencyCommand}"/>
+                        <Button Content="Browse" Command="{Binding BrowseDependencyCommand}"/>
+					</StackPanel>
 
                     <StackPanel>
 						<ItemsControl Margin="0,10,0,0"
@@ -75,7 +80,8 @@
                                 <DataTemplate>
                                     <styles:Card Height="50">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                            <CheckBox IsChecked="{Binding LoadedLibrarySelected}" />
+                                            <TextBlock Text="{Binding LoadedLibraryType}" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </styles:Card>
                                 </DataTemplate>
@@ -86,11 +92,9 @@
             </Expander>
 
             <!-- types in loaded dll -->
-            <StackPanel Margin="0,10,0,0" IsVisible="{Binding LoadedTypes.Count}">
-                <Expander Header="Types" Margin="0,10,0,0">
-                    <ItemsControl Margin="0,10,0,0"
-                                  Items="{Binding LoadedTypes}"
-                                  >
+            <Expander Header="Types" Margin="0,10,0,0" IsVisible="{Binding LoadedTypes.Count}">
+                <StackPanel Margin="10">
+					<ItemsControl Items="{Binding LoadedTypes}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <styles:Card Height="50">
@@ -102,25 +106,24 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </Expander>
-                
 
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,10,0,0">
-                    <Button Content="Select/Deselect all" Margin="0,0,10,0"
-                            Command="{Binding ToggleAllLoadedTypesCommand}" />
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="Select/Deselect all" Margin="0,0,10,0"
+                                Command="{Binding ToggleAllLoadedTypesCommand}" />
 
-                    <Button Content="Refresh" Margin="0,0,0,0"
-                            Command="{Binding RefreshLoadedTypesCommand}"
-                            CommandParameter="{Binding CompiledDllPath}" />
+                        <Button Content="Refresh" Margin="0,0,0,0"
+                                Command="{Binding RefreshLoadedTypesCommand}"
+                                CommandParameter="{Binding CompiledDllPath}" />
+                    </StackPanel>
+
                 </StackPanel>
-
-            </StackPanel>
+            </Expander>
 
             <!-- previewer -->
-            <StackPanel Margin="0,10,0,0" IsVisible="{Binding LoadedTypes.Count}">
-				<Expander Header="Previewer" Margin="0,10,0,0">
-                    <Grid ColumnDefinitions="10*,*,10*">
-                        <TextBox AcceptsReturn="True" AcceptsTab="True" 
+            <Expander Header="Previewer" Margin="0,10,0,0" IsVisible="{Binding LoadedTypes.Count}">
+                <StackPanel Margin="10" >
+					<Grid ColumnDefinitions="10*,*,10*">
+                        <TextBox AcceptsReturn="True" AcceptsTab="True"
                                  TextWrapping="Wrap" Margin="5,0,0,5"
                                  Text="{Binding PreviewerMarkdown}">
 
@@ -136,14 +139,14 @@
                                 </ContextMenu>
                             </md:MarkdownScrollViewer.ContextMenu>
                         </md:MarkdownScrollViewer>
-					</Grid>
-				</Expander>
+                    </Grid>
 
+					<Button Margin="0,10,0,0" Content="Refresh"
+                            HorizontalAlignment="Right"
+                            Command="{Binding RefreshPreviewerCommand}"/>
+                </StackPanel>
 
-				<Button Margin="0,10,0,0" Content="Refresh"
-                        HorizontalAlignment="Right" 
-                        Command="{Binding RefreshPreviewerCommand}"/>
-            </StackPanel>
+            </Expander>
         </StackPanel>
     </ScrollViewer>
 </Window>

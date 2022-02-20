@@ -1,4 +1,5 @@
 ﻿using System;
+using AHpx.RG.Services;
 
 namespace AHpx.RG.ViewModels;
 
@@ -19,8 +20,8 @@ public class LoadedTypeViewModel : ViewModelBase
         get => _loadedTypeSelected;
         set
         {
-            MessageBus.Current.SendMessage(this);
             this.RaiseAndSetIfChanged(ref _loadedTypeSelected, value);
+            ServiceProvider.MessageBus.SendMessage(this);
         }
     }
 
