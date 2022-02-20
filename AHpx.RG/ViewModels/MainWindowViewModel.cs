@@ -2,26 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AHpx.RG.Core.Core;
 using AHpx.RG.Core.Utils;
 using AHpx.RG.Services;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input.Platform;
-using DynamicData;
 using Manganese.Text;
-using Material.Styles.Themes;
-using Material.Styles.Themes.Base;
-using MessageBox.Avalonia;
-using MessageBox.Avalonia.DTO;
-using MessageBox.Avalonia.Enums;
-using MessageBox.Avalonia.Models;
 
 namespace AHpx.RG.ViewModels
 {
@@ -34,13 +25,7 @@ namespace AHpx.RG.ViewModels
 
         public ObservableCollection<LoadedTypeViewModel> LoadedTypes { get; set; } = new();
 
-        private int _loadedTypesBridge;
-
-        public int LoadedTypesBridge
-        {
-            get => _loadedTypesBridge;
-            set => this.RaiseAndSetIfChanged(ref _loadedTypesBridge, value);
-        }
+        public ReactiveCommand<Unit, Unit> OpenGitHubCommand { get; set; }
 
         #region Dll Loading
 
@@ -326,6 +311,50 @@ namespace AHpx.RG.ViewModels
             BrowseDependencyCommand = ReactiveCommand.CreateFromTask(BrowseDependency);
             ReloadDependencyCommand = ReactiveCommand.Create(ReloadDependency);
 
+            OpenGitHubCommand = ReactiveCommand.CreateFromTask(OpenGitHub);
+        }
+
+        private async Task OpenGitHub()
+        {
+            try
+            {
+                // Process.Start("https://github.com/SinoAHpx/AHpx.RG");
+                OpenUrl("https://github.com/SinoAHpx/AHpx.RG");
+            }
+            catch (Exception e)
+            {
+                await ServiceProvider.PromptExceptionDialog(e);
+            }
+        }
+
+        //https://stackoverflow.com/a/43232486/12167919
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
     }
 }

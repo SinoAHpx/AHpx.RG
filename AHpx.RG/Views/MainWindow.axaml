@@ -17,10 +17,15 @@
     <ScrollViewer>
         <StackPanel Margin="10">
             <!-- header line -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="AHpx." FontSize="32" />
-                <TextBlock Text="RG" FontSize="32" Foreground="Purple" />
-            </StackPanel>
+            <DockPanel Margin="0,0,0,10">
+                <TextBlock DockPanel.Dock="Left" Text="AHpx." FontSize="32" />
+                <TextBlock DockPanel.Dock="Left" Text="RG" FontSize="32" Foreground="Purple" />
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Classes="Flat" Content="GitHub" 
+                            VerticalAlignment="Center" Command="{Binding OpenGitHubCommand}"/>
+                </StackPanel>
+            </DockPanel>
 
             <!-- splitter -->
             <Rectangle Height="1" Fill="Gray" />
